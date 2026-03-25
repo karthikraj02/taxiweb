@@ -13,7 +13,10 @@ export function AuthProvider({ children }) {
       try {
         const { data } = await getMe();
         setUser(data.user || data);
-      } catch (_) {
+      } catch (err) {
+        if (err?.response?.status !== 401) {
+          console.debug('Auth check failed:', err.message);
+        }
         setUser(null);
       } finally {
         setLoading(false);
@@ -46,7 +49,9 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await apiLogout();
-    } catch (_) {}
+    } catch (err) {
+      console.debug('Logout API call failed (clearing local state anyway):', err.message);
+    }
     setUser(null);
     toast.success('Logged out successfully');
   };

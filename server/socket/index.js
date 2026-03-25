@@ -23,7 +23,9 @@ function initSocket(server) {
           socket.user = decoded;
         }
       }
-    } catch (_) {}
+    } catch (err) {
+      console.debug('Socket JWT verification failed (unauthenticated connection allowed):', err.message);
+    }
     next();
   });
 

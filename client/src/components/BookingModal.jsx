@@ -136,7 +136,9 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
           bookingId: booking?.bookingId,
         });
       }
-    } catch (_) {}
+    } catch (err) {
+      console.debug('Demo payment verification failed (continuing anyway):', err.message);
+    }
     toast.success('Demo payment completed!');
     setStep(3);
   };
