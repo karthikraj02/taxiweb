@@ -5,6 +5,27 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Fetch CSRF token once and attach to all mutating requests
+let csrfToken = null;
+const getCsrfToken = async () => {
+  if (!csrfToken) {
+    try {
+      const { data } = await axios.get('/api/csrf-token', { withCredentials: true });
+      csrfToken = data.csrfToken;
+    } catch (_) {}
+  }
+  return csrfToken;
+};
+
+api.interceptors.request.use(async (config) => {
+  const safeMethods = ['get', 'head', 'options'];
+  if (!safeMethods.includes((config.method || '').toLowerCase())) {
+    const token = await getCsrfToken();
+    if (token) config.headers['x-csrf-token'] = token;
+  }
+  return config;
+});
+
 let isRefreshing = false;
 let refreshSubscribers = [];
 

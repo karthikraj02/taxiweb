@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+const { doubleCsrf } = require('csrf-csrf');
 const connectDB = require('./config/db');
 const { initSocket } = require('./socket');
 const errorHandler = require('./middleware/errorHandler');
@@ -29,7 +30,7 @@ app.use(cors({
 }));
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET || process.env.JWT_SECRET || 'cookie_secret_dev'));
 
 // General API rate limiter (100 req / 15 min per IP)
 const apiLimiter = rateLimit({
@@ -40,20 +41,26 @@ const apiLimiter = rateLimit({
   message: { message: 'Too many requests, please try again later' }
 });
 
-// CSRF protection: for state-changing requests verify Origin matches allowed origin
-const csrfProtection = (req, res, next) => {
-  const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
-  if (safeMethods.includes(req.method)) return next();
-  const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:3000';
-  const origin = req.headers.origin || req.headers.referer || '';
-  if (origin && !origin.startsWith(allowedOrigin)) {
-    return res.status(403).json({ message: 'CSRF check failed' });
-  }
-  next();
-};
+// CSRF protection using double-submit cookie pattern
+const { generateToken, doubleCsrfProtection } = doubleCsrf({
+  getSecret: () => process.env.JWT_SECRET || 'csrf_secret_dev',
+  cookieName: 'x-csrf-token',
+  cookieOptions: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  },
+  size: 64,
+  ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
+});
 
 app.use('/api', apiLimiter);
-app.use('/api', csrfProtection);
+app.use('/api', doubleCsrfProtection);
+
+// Expose CSRF token endpoint so the SPA can fetch it
+app.get('/api/csrf-token', (req, res) => {
+  res.json({ csrfToken: generateToken(req, res) });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
