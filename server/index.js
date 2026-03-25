@@ -42,8 +42,9 @@ const apiLimiter = rateLimit({
 });
 
 // CSRF protection using double-submit cookie pattern
-const { generateToken, doubleCsrfProtection } = doubleCsrf({
+const { generateCsrfToken, doubleCsrfProtection } = doubleCsrf({
   getSecret: () => process.env.JWT_SECRET || 'csrf_secret_dev',
+  getSessionIdentifier: (req) => req.ip || 'anonymous',
   cookieName: 'x-csrf-token',
   cookieOptions: {
     httpOnly: true,
@@ -59,7 +60,7 @@ app.use('/api', doubleCsrfProtection);
 
 // Expose CSRF token endpoint so the SPA can fetch it
 app.get('/api/csrf-token', (req, res) => {
-  res.json({ csrfToken: generateToken(req, res) });
+  res.json({ csrfToken: generateCsrfToken(req, res) });
 });
 
 app.use('/api/auth', authRoutes);
