@@ -1,8 +1,15 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { protect } = require('../middleware/auth');
 const Booking = require('../models/Booking');
 const { PRICING, ROUND_TRIP_MULTIPLIER } = require('../constants/pricing');
 const router = express.Router();
+
+const bookingLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: { message: 'Too many booking requests, please try again later' }
+});
 
 function generateBookingId() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -21,6 +28,7 @@ function calculateFare(carType, distance, tripType) {
 }
 
 router.use(protect);
+router.use(bookingLimiter);
 
 router.post('/', async (req, res, next) => {
   try {

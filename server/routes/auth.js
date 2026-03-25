@@ -128,7 +128,7 @@ router.post('/verify-otp', authLimiter, async (req, res, next) => {
   }
 });
 
-router.post('/refresh', async (req, res, next) => {
+router.post('/refresh', authLimiter, async (req, res, next) => {
   try {
     const token = req.cookies?.refreshToken;
     if (!token) return res.status(401).json({ message: 'No refresh token' });
@@ -148,7 +148,7 @@ router.post('/refresh', async (req, res, next) => {
   }
 });
 
-router.post('/logout', async (req, res, next) => {
+router.post('/logout', authLimiter, async (req, res, next) => {
   try {
     const token = req.cookies?.refreshToken;
     if (token) {
@@ -162,7 +162,7 @@ router.post('/logout', async (req, res, next) => {
   }
 });
 
-router.get('/me', protect, (req, res) => {
+router.get('/me', authLimiter, protect, (req, res) => {
   res.json({ user: req.user });
 });
 

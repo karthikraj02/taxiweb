@@ -1,9 +1,18 @@
 const express = require('express');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 const { protect } = require('../middleware/auth');
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
 const router = express.Router();
+
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { message: 'Too many payment requests, please try again later' }
+});
+
+router.use(paymentLimiter);
 
 router.post('/razorpay/order', protect, async (req, res, next) => {
   try {

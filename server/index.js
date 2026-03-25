@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const { initSocket } = require('./socket');
 const errorHandler = require('./middleware/errorHandler');
@@ -29,6 +30,30 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
+
+// General API rate limiter (100 req / 15 min per IP)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests, please try again later' }
+});
+
+// CSRF protection: for state-changing requests verify Origin matches allowed origin
+const csrfProtection = (req, res, next) => {
+  const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
+  if (safeMethods.includes(req.method)) return next();
+  const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:3000';
+  const origin = req.headers.origin || req.headers.referer || '';
+  if (origin && !origin.startsWith(allowedOrigin)) {
+    return res.status(403).json({ message: 'CSRF check failed' });
+  }
+  next();
+};
+
+app.use('/api', apiLimiter);
+app.use('/api', csrfProtection);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);

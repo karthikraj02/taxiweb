@@ -1,8 +1,17 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { protect } = require('../middleware/auth');
 const Driver = require('../models/Driver');
 const { getIO } = require('../socket');
 const router = express.Router();
+
+const driverLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: { message: 'Too many requests, please try again later' }
+});
+
+router.use(driverLimiter);
 
 router.get('/', async (req, res, next) => {
   try {
