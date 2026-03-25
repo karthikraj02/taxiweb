@@ -42,7 +42,10 @@ router.post('/', async (req, res, next) => {
     do {
       bookingId = generateBookingId();
       attempts++;
-    } while (await Booking.findOne({ bookingId }) && attempts < 10);
+      if (attempts >= 10) {
+        return res.status(500).json({ message: 'Unable to generate unique booking ID, please try again' });
+      }
+    } while (await Booking.findOne({ bookingId }));
 
     const booking = await Booking.create({
       bookingId,

@@ -30,7 +30,7 @@ app.use(cors({
 }));
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(cookieParser(process.env.COOKIE_SECRET || process.env.JWT_SECRET || 'cookie_secret_dev'));
+app.use(cookieParser(process.env.COOKIE_SECRET || (process.env.NODE_ENV === 'production' ? undefined : 'cookie_secret_dev')));
 
 // General API rate limiter (100 req / 15 min per IP)
 const apiLimiter = rateLimit({

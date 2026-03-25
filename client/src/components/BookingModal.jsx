@@ -121,7 +121,7 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => new window.Razorpay(options).open();
-      script.onerror = () => toast.error('Failed to load Razorpay');
+      script.onerror = () => toast.error('Failed to load Razorpay. Please check your internet connection and try again.');
       document.head.appendChild(script);
     }
   };
