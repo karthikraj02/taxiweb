@@ -1,0 +1,135 @@
+.booking-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.booking-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 380px;
+  background: white;
+  z-index: 2;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.booking-panel h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  gap: 10px;
+}
+
+.input-group input {
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  font-size: 15px;
+  padding: 5px;
+}
+
+.icon {
+  font-size: 16px;
+}
+.pickup-icon { color: #2563eb; }
+.drop-icon { color: #ef4444; }
+
+.map-select-btn, .gps-btn {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.map-select-btn.active {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
+
+.map-helper-text {
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 500;
+  animation: pulse 2s infinite;
+}
+
+.calculate-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.calculate-btn:hover { background: #333; }
+
+.trip-details {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  margin-top: 5px;
+}
+
+.fare-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #e2e8f0;
+}
+
+.fare-amount {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.confirm-btn {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
