@@ -89,4 +89,7 @@ export const verifyPayment = (data) => api.post('/api/payments/razorpay/verify',
 export const getDrivers = (carType) =>
   api.get('/api/drivers', { params: carType ? { carType } : {} });
 
+export const updateBookingStatus = (id, status) =>
+  api.put(`/api/bookings/${id}/status`, { status });
+
 export default api;

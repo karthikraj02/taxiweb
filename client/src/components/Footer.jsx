@@ -97,8 +97,8 @@ export default function Footer() {
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <span>📞</span>
-                <a href="tel:+919876543210" style={{ color: 'var(--primary)', fontSize: '0.875rem', textDecoration: 'none' }}>
-                  +91 98765 43210
+                <a href="tel:+919731470096" style={{ color: 'var(--primary)', fontSize: '0.875rem', textDecoration: 'none' }}>
+                  +91 97314 70096
                 </a>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>

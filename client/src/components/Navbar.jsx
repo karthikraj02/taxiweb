@@ -24,6 +24,7 @@ export default function Navbar({ onAuthClick }) {
     { label: 'Tours', id: 'tours' },
     { label: 'Track', id: 'track' },
     { label: 'Contact', id: 'contact' },
+    ...(user?.role === 'admin' ? [{ label: 'Admin Dashboard', id: 'admin' }] : []),
   ];
 
   const navStyle = {

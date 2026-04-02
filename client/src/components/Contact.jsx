@@ -25,7 +25,7 @@ export default function Contact() {
 
   const contactInfo = [
     { icon: '📍', label: 'Address', value: 'Near KMC Hospital, Manipal Road, Udupi, Karnataka 576101', link: null },
-    { icon: '📞', label: 'Phone', value: '+91 98765 43210', link: 'tel:+919876543210' },
+    { icon: '📞', label: 'Phone', value: '+91 97314 70096', link: 'tel:+919731470096' },
     { icon: '✉️', label: 'Email', value: 'bookings@udupikaxi.com', link: 'mailto:bookings@udupikaxi.com' },
     { icon: '⏰', label: 'Hours', value: '24/7 Available', link: null },
   ];
