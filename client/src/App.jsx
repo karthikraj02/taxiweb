@@ -28,7 +28,7 @@ export default function App() {
 
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#f8fafc', border: '1px solid #334155' } }} />
+      <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(8,18,42,0.95)', color: '#e0f4ff', border: '1px solid rgba(0,212,255,0.2)', backdropFilter: 'blur(12px)', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 } }} />
       <Navbar onAuthClick={() => setShowAuthModal(true)} />
       <main>
         <section id="home"><Hero onBookNow={() => openBooking()} /></section>
@@ -47,15 +47,18 @@ export default function App() {
         onClick={() => openBooking()}
         style={{
           position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 999,
-          background: 'var(--primary)', color: '#000', border: 'none',
-          borderRadius: '3rem', padding: '1rem 1.5rem', fontWeight: 700,
-          fontSize: '1rem', cursor: 'pointer', boxShadow: '0 4px 20px rgba(245,158,11,0.4)',
+          background: 'linear-gradient(135deg, #00d4ff, #7b2fff)',
+          color: '#fff', border: 'none',
+          borderRadius: '0.5rem', padding: '0.9rem 1.5rem', fontWeight: 700,
+          fontSize: '0.9rem', cursor: 'pointer',
+          boxShadow: '0 0 20px rgba(0,212,255,0.35), 0 8px 30px rgba(0,0,0,0.4)',
           display: 'flex', alignItems: 'center', gap: '0.5rem',
           transition: 'transform 0.2s, box-shadow 0.2s',
-          fontFamily: 'Poppins, sans-serif'
+          fontFamily: 'Rajdhani, sans-serif',
+          letterSpacing: '0.06em', textTransform: 'uppercase',
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(245,158,11,0.5)'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(245,158,11,0.4)'; }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 0 35px rgba(0,212,255,0.5), 0 12px 40px rgba(0,0,0,0.4)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0,212,255,0.35), 0 8px 30px rgba(0,0,0,0.4)'; }}
       >
         🚕 Book a Ride
       </button>

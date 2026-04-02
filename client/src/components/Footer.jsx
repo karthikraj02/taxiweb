@@ -32,26 +32,66 @@ export default function Footer() {
   };
 
   return (
-    <footer style={{ background: '#0a0f1a', borderTop: '1px solid var(--border)', paddingTop: '3rem' }}>
-      <div className="container">
+    <footer style={{
+      background: '#020710',
+      borderTop: '1px solid rgba(0,212,255,0.1)',
+      paddingTop: '3.5rem',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Background grid */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px)',
+        backgroundSize: '60px 60px',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Top glow line */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
+        background: 'linear-gradient(90deg, transparent, rgba(0,212,255,0.4), rgba(123,47,255,0.4), transparent)',
+      }} />
+
+      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         {/* Top Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '2.5rem' }}>
           {/* Brand */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <span style={{ fontSize: '1.8rem' }}>🚕</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>
-                Udupi <span style={{ color: 'var(--primary)' }}>Taxi</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '50%',
+                background: 'linear-gradient(135deg, rgba(0,212,255,0.12), rgba(123,47,255,0.12))',
+                border: '1px solid rgba(0,212,255,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '1.3rem',
+              }}>🚕</div>
+              <span style={{
+                fontFamily: 'Orbitron, sans-serif',
+                fontSize: '1.1rem', fontWeight: 700,
+                color: 'var(--text-light)', letterSpacing: '0.04em',
+              }}>
+                Udupi{' '}
+                <span style={{
+                  background: 'linear-gradient(135deg, #00d4ff, #7b2fff)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>Taxi</span>
               </span>
             </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.7, maxWidth: '240px' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.83rem', lineHeight: 1.75, maxWidth: '230px', fontFamily: 'Rajdhani, sans-serif' }}>
               Your trusted travel partner since 2010. Reliable, comfortable, and always on time.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--text-light)' }}>Quick Links</h4>
+            <h4 style={{
+              fontWeight: 700, marginBottom: '1.1rem', color: 'var(--primary)',
+              fontFamily: 'Rajdhani, sans-serif', fontSize: '0.78rem',
+              textTransform: 'uppercase', letterSpacing: '0.12em',
+            }}>Quick Links</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {LINKS['Quick Links'].map(link => (
                 <li key={link.label}>
@@ -59,14 +99,15 @@ export default function Footer() {
                     onClick={() => scrollTo(link.id)}
                     style={{
                       background: 'none', border: 'none', cursor: link.id ? 'pointer' : 'default',
-                      color: 'var(--text-muted)', fontFamily: 'Poppins, sans-serif',
-                      fontSize: '0.875rem', padding: '0', textAlign: 'left',
+                      color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif',
+                      fontSize: '0.875rem', fontWeight: 500, padding: '0', textAlign: 'left',
                       transition: 'color 0.2s',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'var(--primary)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; }}
                   >
-                    → {link.label}
+                    <span style={{ color: 'rgba(0,212,255,0.4)', marginRight: '0.4rem' }}>›</span>
+                    {link.label}
                   </button>
                 </li>
               ))}
@@ -75,11 +116,16 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--text-light)' }}>Services</h4>
+            <h4 style={{
+              fontWeight: 700, marginBottom: '1.1rem', color: 'var(--primary)',
+              fontFamily: 'Rajdhani, sans-serif', fontSize: '0.78rem',
+              textTransform: 'uppercase', letterSpacing: '0.12em',
+            }}>Services</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {LINKS['Services'].map(s => (
-                <li key={s.label} style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                  → {s.label}
+                <li key={s.label} style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontFamily: 'Rajdhani, sans-serif' }}>
+                  <span style={{ color: 'rgba(0,212,255,0.4)', marginRight: '0.4rem' }}>›</span>
+                  {s.label}
                 </li>
               ))}
             </ul>
@@ -87,43 +133,56 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--text-light)' }}>Contact</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <h4 style={{
+              fontWeight: 700, marginBottom: '1.1rem', color: 'var(--primary)',
+              fontFamily: 'Rajdhani, sans-serif', fontSize: '0.78rem',
+              textTransform: 'uppercase', letterSpacing: '0.12em',
+            }}>Contact</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-                <span>📍</span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.5 }}>
+                <span style={{ fontSize: '0.9rem', marginTop: '2px' }}>📍</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.83rem', lineHeight: 1.55, fontFamily: 'Rajdhani, sans-serif' }}>
                   Near KMC Hospital, Manipal Road, Udupi, Karnataka 576101
                 </span>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <span>📞</span>
-                <a href="tel:+919731470096" style={{ color: 'var(--primary)', fontSize: '0.875rem', textDecoration: 'none' }}>
+                <span style={{ fontSize: '0.9rem' }}>📞</span>
+                <a href="tel:+919731470096" style={{ color: 'var(--primary)', fontSize: '0.875rem', textDecoration: 'none', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 }}>
                   +91 97314 70096
                 </a>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <span>✉️</span>
-                <a href="mailto:bookings@udupikaxi.com" style={{ color: 'var(--primary)', fontSize: '0.875rem', textDecoration: 'none' }}>
+                <span style={{ fontSize: '0.9rem' }}>✉️</span>
+                <a href="mailto:bookings@udupikaxi.com" style={{ color: 'var(--primary)', fontSize: '0.875rem', textDecoration: 'none', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 }}>
                   bookings@udupikaxi.com
                 </a>
               </div>
             </div>
 
             {/* Social */}
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.25rem' }}>
               {SOCIAL.map(s => (
                 <a
                   key={s.label}
                   href={s.href}
                   title={s.label}
                   style={{
-                    width: '38px', height: '38px', borderRadius: '50%',
-                    background: 'var(--bg-card)', border: '1px solid var(--border)',
+                    width: '36px', height: '36px', borderRadius: '0.4rem',
+                    background: 'rgba(0,212,255,0.05)',
+                    border: '1px solid rgba(0,212,255,0.15)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '1rem', textDecoration: 'none', transition: 'all 0.2s',
+                    fontSize: '0.95rem', textDecoration: 'none', transition: 'all 0.25s',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.background = 'rgba(245,158,11,0.1)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'rgba(0,212,255,0.5)';
+                    e.currentTarget.style.background = 'rgba(0,212,255,0.1)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(0,212,255,0.15)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)';
+                    e.currentTarget.style.background = 'rgba(0,212,255,0.05)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   {s.icon}
                 </a>
@@ -134,17 +193,19 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div style={{
-          borderTop: '1px solid var(--border)', paddingTop: '1.25rem', paddingBottom: '1.25rem',
+          borderTop: '1px solid rgba(0,212,255,0.1)',
+          paddingTop: '1.25rem', paddingBottom: '1.5rem',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem',
         }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontFamily: 'Rajdhani, sans-serif', letterSpacing: '0.04em' }}>
             © 2024 Udupi Taxi. All rights reserved.
           </span>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            Made with ❤️ in Udupi, Karnataka
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontFamily: 'Rajdhani, sans-serif' }}>
+            Made with <span style={{ color: 'var(--danger)' }}>❤️</span> in Udupi, Karnataka
           </span>
         </div>
       </div>
     </footer>
   );
 }
+
