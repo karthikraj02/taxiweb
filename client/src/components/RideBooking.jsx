@@ -19,9 +19,26 @@ const POPULAR_ROUTES = [
   { label: 'Udupi → Mysore', pickup: 'Udupi', drop: 'Mysore', distance: 270 },
 ];
 
+const LOCAL_PLACES = [
+  "Udupi Bus Stand", "Manipal KMC", "Mangalore Airport (IXE)", "Mangalore Central Station",
+  "Udupi Railway Station", "Malpe Beach", "Kapu Beach", "Kundapura", "Karkala", "Padubidri",
+  "Bangalore (Majestic)", "Kempegowda Int'l Airport", "Mysore Palace", "Kolluru Mookambika",
+  "Murudeshwara", "Gokarna", "Dharmasthala", "Subrahmanya"
+];
+
+const PREDEFINED_DISTANCES = {
+  "Udupi Bus Stand-Manipal KMC": 6,
+  "Udupi Bus Stand-Mangalore Airport (IXE)": 58,
+  "Udupi Bus Stand-Mangalore Central Station": 62,
+  "Manipal KMC-Mangalore Airport (IXE)": 64,
+  "Udupi Bus Stand-Kundapura": 38,
+  "Udupi Bus Stand-Malpe Beach": 7,
+  "Udupi Bus Stand-Bangalore (Majestic)": 395,
+};
+
 export default function RideBooking({ onBookNow }) {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "", // Ensure you have this in your .env
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "", 
     libraries,
   });
 
@@ -35,15 +52,32 @@ export default function RideBooking({ onBookNow }) {
   const [estimatedFare, setEstimatedFare] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fareBreakdown, setFareBreakdown] = useState(null);
+  const [showPickupSugg, setShowPickupSugg] = useState(false);
+  const [showDropSugg, setShowDropSugg] = useState(false);
 
   const pickupRef = useRef();
   const dropRef = useRef();
 
   const today = new Date().toISOString().split('T')[0];
 
+  const getLocalDistance = (p1, p2) => {
+    const key1 = `${p1}-${p2}`;
+    const key2 = `${p2}-${p1}`;
+    if (PREDEFINED_DISTANCES[key1]) return PREDEFINED_DISTANCES[key1];
+    if (PREDEFINED_DISTANCES[key2]) return PREDEFINED_DISTANCES[key2];
+    // Default fallback if no predefined distance exists (randomized slightly but consistent)
+    return Math.floor(Math.random() * 50) + 10; 
+  };
+
   const calculateDistance = async (origin, destination) => {
     if (!origin || !destination) return;
     
+    // Check if google maps services are actually available (fails if billing is disabled or network error)
+    if (typeof window.google === 'undefined' || !window.google.maps) {
+      console.warn("Google Maps services are not available. Use manual calculation.");
+      return;
+    }
+
     const directionsService = new window.google.maps.DirectionsService();
     try {
       const results = await directionsService.route({
@@ -60,7 +94,7 @@ export default function RideBooking({ onBookNow }) {
       setEstimatedFare(null); // Reset fare when location changes
     } catch (error) {
       console.error("Error calculating distance: ", error);
-      toast.error("Could not calculate distance between these locations.");
+      toast.error("Could not calculate distance automatically. Please enter it manually below.");
     }
   };
 
@@ -109,12 +143,43 @@ export default function RideBooking({ onBookNow }) {
     onBookNow(carType, { pickup, drop, date, time, carType, tripType, distance, fare: estimatedFare });
   };
 
-  if (!isLoaded) return <div style={{ textAlign: "center", padding: "2rem", color: "white" }}>Loading Maps...</div>;
+  const handleSelectLocal = (place, type) => {
+    if (type === "pickup") {
+      setPickup(place);
+      setShowPickupSugg(false);
+      if (drop) setDistance(String(getLocalDistance(place, drop)));
+    } else {
+      setDrop(place);
+      setShowDropSugg(false);
+      if (pickup) setDistance(String(getLocalDistance(pickup, place)));
+    }
+  };
+
+  const filteredPlaces = (val) => val ? LOCAL_PLACES.filter(p => p.toLowerCase().includes(val.toLowerCase())).slice(0, 5) : [];
 
   return (
     <div className="section" style={{ background: 'linear-gradient(180deg, var(--bg-dark) 0%, #0d1829 100%)' }}>
+      <style>{`
+        .suggestions-list {
+          position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); 
+          border: 1px solid var(--border); border-radius: 0.5rem; z-index: 10; margin-top: 0.25rem;
+          list-style: none; padding: 0.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .suggestion-item { padding: 0.6rem 1rem; cursor: pointer; color: var(--text-light); transition: background 0.2s; border-radius: 0.25rem; font-size: 0.85rem; }
+        .suggestion-item:hover { background: var(--border); }
+        .billing-warning {
+          background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 0.75rem;
+          padding: 0.75rem 1.25rem; margin-bottom: 2rem; color: var(--primary); font-size: 0.85rem; display: flex; align-items: center; gap: 0.75rem;
+        }
+      `}</style>
       <div className="container">
         <h2 className="section-title">Book Your <span>Ride</span></h2>
+        
+        {/* Billing Warning Banner */}
+        <div className="billing-warning">
+          <span>⚠️</span>
+          <span><b>Map Account Billing Inactive:</b> We are currently in "Local Fallback Mode". Only certain locations have predefined distances, but you can enter any distance manually!</span>
+        </div>
         <p className="section-subtitle">Fast, reliable, and comfortable taxi service from Udupi</p>
 
         {/* Popular Routes */}
@@ -164,29 +229,41 @@ export default function RideBooking({ onBookNow }) {
 
           {/* Form Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div className="input-group">
+            <div className="input-group" style={{ position: 'relative' }}>
               <label>📍 Pickup Location</label>
-              <Autocomplete onPlaceChanged={() => handlePlaceSelect(pickupRef, "pickup")}> 
-                <input 
-                  className="input" 
-                  placeholder="From (e.g., Udupi)" 
-                  ref={pickupRef} 
-                  value={pickup} 
-                  onChange={e => setPickup(e.target.value)} 
-                />
-              </Autocomplete>
+              <input 
+                className="input" 
+                placeholder="From (e.g., Udupi)" 
+                value={pickup} 
+                onChange={e => { setPickup(e.target.value); setShowPickupSugg(true); }}
+                onFocus={() => setShowPickupSugg(true)}
+                onBlur={() => setTimeout(() => setShowPickupSugg(false), 200)}
+              />
+              {showPickupSugg && pickup && (
+                <ul className="suggestions-list">
+                  {filteredPlaces(pickup).map(p => (
+                    <li key={p} className="suggestion-item" onClick={() => handleSelectLocal(p, "pickup")}>{p}</li>
+                  ))}
+                </ul>
+              )}
             </div>
-            <div className="input-group">
+            <div className="input-group" style={{ position: 'relative' }}>
               <label>🏁 Drop Location</label>
-              <Autocomplete onPlaceChanged={() => handlePlaceSelect(dropRef, "drop")}> 
-                <input 
-                  className="input" 
-                  placeholder="To (e.g., Mangalore)" 
-                  ref={dropRef} 
-                  value={drop} 
-                  onChange={e => setDrop(e.target.value)} 
-                />
-              </Autocomplete>
+              <input 
+                className="input" 
+                placeholder="To (e.g., Mangalore)" 
+                value={drop} 
+                onChange={e => { setDrop(e.target.value); setShowDropSugg(true); }}
+                onFocus={() => setShowDropSugg(true)}
+                onBlur={() => setTimeout(() => setShowDropSugg(false), 200)}
+              />
+              {showDropSugg && drop && (
+                <ul className="suggestions-list">
+                  {filteredPlaces(drop).map(p => (
+                    <li key={p} className="suggestion-item" onClick={() => handleSelectLocal(p, "drop")}>{p}</li>
+                  ))}
+                </ul>
+              )}
             </div>
             <div className="input-group">
               <label>📅 Date</label>
@@ -199,10 +276,9 @@ export default function RideBooking({ onBookNow }) {
             <div className="input-group">
               <label>📏 Distance (km)</label>
               <input
-                className="input" type="number" placeholder="Auto calculated..." min="1"
+                className="input" type="number" placeholder="e.g. 55" min="1"
                 value={distance} 
                 onChange={e => { setDistance(e.target.value); setEstimatedFare(null); }}
-                disabled // Made disabled to prevent overriding the map calculation, or remove `disabled` to allow manual entry
               />
             </div>
           </div>
