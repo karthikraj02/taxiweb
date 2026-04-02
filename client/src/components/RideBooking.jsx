@@ -158,23 +158,40 @@ export default function RideBooking({ onBookNow }) {
   const filteredPlaces = (val) => val ? LOCAL_PLACES.filter(p => p.toLowerCase().includes(val.toLowerCase())).slice(0, 5) : [];
 
   return (
-    <div className="section" style={{ background: 'linear-gradient(180deg, var(--bg-dark) 0%, #0d1829 100%)' }}>
+    <div className="section" style={{ background: 'linear-gradient(180deg, var(--bg-dark) 0%, #080f20 100%)', position: 'relative', overflow: 'hidden' }}>
+      <div className="cyber-grid-bg" style={{ opacity: 0.3 }} />
       <style>{`
         .suggestions-list {
-          position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); 
-          border: 1px solid var(--border); border-radius: 0.5rem; z-index: 10; margin-top: 0.25rem;
-          list-style: none; padding: 0.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+          position: absolute; top: 100%; left: 0; right: 0;
+          background: rgba(8,18,42,0.95);
+          border: 1px solid rgba(0,212,255,0.2);
+          border-radius: 0.4rem; z-index: 10; margin-top: 0.25rem;
+          list-style: none; padding: 0.25rem;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 15px rgba(0,212,255,0.05);
+          backdrop-filter: blur(16px);
         }
-        .suggestion-item { padding: 0.6rem 1rem; cursor: pointer; color: var(--text-light); transition: background 0.2s; border-radius: 0.25rem; font-size: 0.85rem; }
-        .suggestion-item:hover { background: var(--border); }
+        .suggestion-item {
+          padding: 0.6rem 1rem; cursor: pointer; color: var(--text-light);
+          transition: background 0.2s; border-radius: 0.25rem;
+          font-size: 0.85rem; font-family: 'Rajdhani', sans-serif; font-weight: 500;
+        }
+        .suggestion-item:hover { background: rgba(0,212,255,0.08); color: var(--primary); }
         .billing-warning {
-          background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 0.75rem;
-          padding: 0.75rem 1.25rem; margin-bottom: 2rem; color: var(--primary); font-size: 0.85rem; display: flex; align-items: center; gap: 0.75rem;
+          background: rgba(255,170,0,0.06);
+          border: 1px solid rgba(255,170,0,0.25);
+          border-radius: 0.5rem;
+          padding: 0.75rem 1.25rem; margin-bottom: 2rem;
+          color: var(--warn); font-size: 0.83rem;
+          display: flex; align-items: center; gap: 0.75rem;
+          font-family: 'Rajdhani', sans-serif;
         }
       `}</style>
-      <div className="container">
+      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+          <div className="badge" style={{ marginBottom: '1rem' }}>🚕 Instant Booking</div>
+        </div>
         <h2 className="section-title">Book Your <span>Ride</span></h2>
-        
+
         {/* Billing Warning Banner */}
         <div className="billing-warning">
           <span>⚠️</span>
@@ -183,19 +200,31 @@ export default function RideBooking({ onBookNow }) {
         <p className="section-subtitle">Fast, reliable, and comfortable taxi service from Udupi</p>
 
         {/* Popular Routes */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center', marginBottom: '2.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center', marginBottom: '2.5rem' }}>
           {POPULAR_ROUTES.map(route => (
             <button
               key={route.label}
               onClick={() => handleRoute(route)}
               style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                color: 'var(--text-muted)', padding: '0.5rem 1rem', borderRadius: '2rem',
-                cursor: 'pointer', fontFamily: 'Poppins, sans-serif', fontSize: '0.85rem',
-                transition: 'all 0.2s',
+                background: 'rgba(8,18,42,0.7)',
+                border: '1px solid rgba(0,212,255,0.15)',
+                color: 'var(--text-muted)', padding: '0.45rem 1rem', borderRadius: '0.35rem',
+                cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontSize: '0.82rem',
+                fontWeight: 600, letterSpacing: '0.04em',
+                transition: 'all 0.25s', backdropFilter: 'blur(8px)',
               }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'rgba(0,212,255,0.4)';
+                e.currentTarget.style.color = 'var(--primary)';
+                e.currentTarget.style.background = 'rgba(0,212,255,0.06)';
+                e.currentTarget.style.boxShadow = '0 0 10px rgba(0,212,255,0.1)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)';
+                e.currentTarget.style.color = 'var(--text-muted)';
+                e.currentTarget.style.background = 'rgba(8,18,42,0.7)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             >
               📍 {route.label} ({route.distance}km)
             </button>
@@ -203,11 +232,18 @@ export default function RideBooking({ onBookNow }) {
         </div>
 
         <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border)',
-          borderRadius: '1.5rem', padding: '2rem',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+          background: 'rgba(8,18,42,0.8)',
+          border: '1px solid rgba(0,212,255,0.15)',
+          borderRadius: '0.75rem', padding: '2rem',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(0,212,255,0.04)',
           maxWidth: '900px', margin: '0 auto',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          position: 'relative', overflow: 'hidden',
         }}>
+          {/* Top gradient line */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent)' }} />
+
           {/* Trip Type Toggle */}
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
             {['one-way', 'round-trip'].map(type => (
@@ -215,11 +251,16 @@ export default function RideBooking({ onBookNow }) {
                 key={type}
                 onClick={() => { setTripType(type); setEstimatedFare(null); }}
                 style={{
-                  padding: '0.5rem 1.25rem', borderRadius: '2rem', border: 'none',
-                  cursor: 'pointer', fontFamily: 'Poppins, sans-serif', fontWeight: 600,
-                  fontSize: '0.875rem', transition: 'all 0.2s',
-                  background: tripType === type ? 'var(--primary)' : 'var(--bg-dark)',
-                  color: tripType === type ? '#000' : 'var(--text-muted)',
+                  padding: '0.5rem 1.25rem', borderRadius: '0.35rem',
+                  cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontWeight: 700,
+                  fontSize: '0.85rem', transition: 'all 0.2s', letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  background: tripType === type
+                    ? 'linear-gradient(135deg, var(--primary), var(--secondary))'
+                    : 'rgba(0,212,255,0.04)',
+                  color: tripType === type ? '#fff' : 'var(--text-muted)',
+                  border: tripType === type ? 'none' : '1px solid rgba(0,212,255,0.1)',
+                  boxShadow: tripType === type ? '0 0 15px rgba(0,212,255,0.25)' : 'none',
                 }}
               >
                 {type === 'one-way' ? '→ One Way' : '↔ Round Trip'}
@@ -231,10 +272,10 @@ export default function RideBooking({ onBookNow }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
             <div className="input-group" style={{ position: 'relative' }}>
               <label>📍 Pickup Location</label>
-              <input 
-                className="input" 
-                placeholder="From (e.g., Udupi)" 
-                value={pickup} 
+              <input
+                className="input"
+                placeholder="From (e.g., Udupi)"
+                value={pickup}
                 onChange={e => { setPickup(e.target.value); setShowPickupSugg(true); }}
                 onFocus={() => setShowPickupSugg(true)}
                 onBlur={() => setTimeout(() => setShowPickupSugg(false), 200)}
@@ -249,10 +290,10 @@ export default function RideBooking({ onBookNow }) {
             </div>
             <div className="input-group" style={{ position: 'relative' }}>
               <label>🏁 Drop Location</label>
-              <input 
-                className="input" 
-                placeholder="To (e.g., Mangalore)" 
-                value={drop} 
+              <input
+                className="input"
+                placeholder="To (e.g., Mangalore)"
+                value={drop}
                 onChange={e => { setDrop(e.target.value); setShowDropSugg(true); }}
                 onFocus={() => setShowDropSugg(true)}
                 onBlur={() => setTimeout(() => setShowDropSugg(false), 200)}
@@ -277,7 +318,7 @@ export default function RideBooking({ onBookNow }) {
               <label>📏 Distance (km)</label>
               <input
                 className="input" type="number" placeholder="e.g. 55" min="1"
-                value={distance} 
+                value={distance}
                 onChange={e => { setDistance(e.target.value); setEstimatedFare(null); }}
               />
             </div>
@@ -285,23 +326,24 @@ export default function RideBooking({ onBookNow }) {
 
           {/* Car Type Selector */}
           <div style={{ marginBottom: '1.5rem' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>🚗 Select Car Type</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.875rem', fontFamily: 'Rajdhani, sans-serif', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>🚗 Select Car Type</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
               {CAR_TYPES.map(car => (
                 <button
                   key={car.id}
                   onClick={() => { setCarType(car.id); setEstimatedFare(null); }}
                   style={{
-                    padding: '0.875rem', borderRadius: '0.75rem', cursor: 'pointer',
-                    fontFamily: 'Poppins, sans-serif', textAlign: 'center', transition: 'all 0.2s',
-                    background: carType === car.id ? 'rgba(245,158,11,0.15)' : 'var(--bg-dark)',
-                    border: carType === car.id ? '2px solid var(--primary)' : '2px solid var(--border)',
+                    padding: '0.875rem', borderRadius: '0.5rem', cursor: 'pointer',
+                    fontFamily: 'Rajdhani, sans-serif', textAlign: 'center', transition: 'all 0.25s',
+                    background: carType === car.id ? 'rgba(0,212,255,0.08)' : 'rgba(0,212,255,0.02)',
+                    border: carType === car.id ? '2px solid var(--primary)' : '1px solid rgba(0,212,255,0.12)',
                     color: 'var(--text-light)',
+                    boxShadow: carType === car.id ? '0 0 15px rgba(0,212,255,0.15)' : 'none',
                   }}
                 >
-                  <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{car.emoji}</div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.15rem' }}>{car.label}</div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--primary)' }}>{car.rate} · Min {car.min}</div>
+                  <div style={{ fontSize: '1.5rem', marginBottom: '0.3rem' }}>{car.emoji}</div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.15rem', letterSpacing: '0.04em' }}>{car.label}</div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--primary)', fontWeight: 600 }}>{car.rate} · Min {car.min}</div>
                 </button>
               ))}
             </div>
@@ -310,28 +352,33 @@ export default function RideBooking({ onBookNow }) {
           {/* Fare Estimate */}
           {estimatedFare && fareBreakdown && (
             <div style={{
-              background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
-              borderRadius: '0.75rem', padding: '1rem 1.25rem', marginBottom: '1.5rem',
+              background: 'rgba(0,212,255,0.05)',
+              border: '1px solid rgba(0,212,255,0.2)',
+              borderRadius: '0.5rem', padding: '1rem 1.25rem', marginBottom: '1.5rem',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem',
             }}>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '0.2rem' }}>Estimated Fare</div>
-                <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary)' }}>₹{estimatedFare.toLocaleString()}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.2rem', fontFamily: 'Rajdhani, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Estimated Fare</div>
+                <div style={{
+                  fontSize: '2.2rem', fontWeight: 800, color: 'var(--primary)',
+                  fontFamily: 'Orbitron, sans-serif',
+                  textShadow: '0 0 20px rgba(0,212,255,0.4)',
+                }}>₹{estimatedFare.toLocaleString()}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif' }}>
                   Base ₹{fareBreakdown.baseAmount} + {distance}km @ ₹{fareBreakdown.ratePerKm}/km
                   {tripType === 'round-trip' && ' × 1.9 (round trip)'}
                 </div>
               </div>
               <div className="badge">✓ Inclusive of all charges</div>
             </div>
-          )} 
+          )}
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             <button className="btn btn-secondary" onClick={handleEstimate} disabled={loading} style={{ flex: '1', minWidth: '140px', justifyContent: 'center' }}>
               {loading ? <span className="spinner-light" /> : '💰 Get Estimate'}
             </button>
-            <button className="btn btn-primary" onClick={handleBookNow} style={{ flex: '2', minWidth: '180px', justifyContent: 'center', fontWeight: 600 }}>
+            <button className="btn btn-primary" onClick={handleBookNow} style={{ flex: '2', minWidth: '180px', justifyContent: 'center', fontWeight: 700 }}>
               🚕 Book Now
             </button>
           </div>
