@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { estimateFare } from '../api/index.js';
 import toast from 'react-hot-toast';
+import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
+
+const libraries = ["places"];
 
 const CAR_TYPES = [
   { id: 'etios', label: 'Toyota Etios', emoji: '🚗', rate: '₹12/km', min: '₹600' },
@@ -17,6 +20,11 @@ const POPULAR_ROUTES = [
 ];
 
 export default function RideBooking({ onBookNow }) {
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "", // Ensure you have this in your .env
+    libraries,
+  });
+
   const [pickup, setPickup] = useState('');
   const [drop, setDrop] = useState('');
   const [date, setDate] = useState('');
@@ -28,7 +36,45 @@ export default function RideBooking({ onBookNow }) {
   const [loading, setLoading] = useState(false);
   const [fareBreakdown, setFareBreakdown] = useState(null);
 
+  const pickupRef = useRef();
+  const dropRef = useRef();
+
   const today = new Date().toISOString().split('T')[0];
+
+  const calculateDistance = async (origin, destination) => {
+    if (!origin || !destination) return;
+    
+    const directionsService = new window.google.maps.DirectionsService();
+    try {
+      const results = await directionsService.route({
+        origin: origin,
+        destination: destination,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      });
+
+      // Distance is retrieved in meters, converting it to km
+      const distValue = results.routes[0].legs[0].distance.value; 
+      const distanceInKm = (distValue / 1000).toFixed(1);
+      
+      setDistance(distanceInKm);
+      setEstimatedFare(null); // Reset fare when location changes
+    } catch (error) {
+      console.error("Error calculating distance: ", error);
+      toast.error("Could not calculate distance between these locations.");
+    }
+  };
+
+  const handlePlaceSelect = (ref, type) => {
+    if (!ref.current.value) return;
+    
+    if (type === "pickup") {
+      setPickup(ref.current.value);
+      if (drop) calculateDistance(ref.current.value, drop);
+    } else {
+      setDrop(ref.current.value);
+      if (pickup) calculateDistance(pickup, ref.current.value);
+    }
+  };
 
   const handleEstimate = async () => {
     if (!distance || !carType) {
@@ -51,6 +97,8 @@ export default function RideBooking({ onBookNow }) {
     setPickup(route.pickup);
     setDrop(route.drop);
     setDistance(String(route.distance));
+    if (pickupRef.current) pickupRef.current.value = route.pickup;
+    if (dropRef.current) dropRef.current.value = route.drop;
   };
 
   const handleBookNow = () => {
@@ -60,6 +108,8 @@ export default function RideBooking({ onBookNow }) {
     }
     onBookNow(carType, { pickup, drop, date, time, carType, tripType, distance, fare: estimatedFare });
   };
+
+  if (!isLoaded) return <div style={{ textAlign: "center", padding: "2rem", color: "white" }}>Loading Maps...</div>;
 
   return (
     <div className="section" style={{ background: 'linear-gradient(180deg, var(--bg-dark) 0%, #0d1829 100%)' }}>
@@ -116,11 +166,27 @@ export default function RideBooking({ onBookNow }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
             <div className="input-group">
               <label>📍 Pickup Location</label>
-              <input className="input" placeholder="From (e.g., Udupi)" value={pickup} onChange={e => setPickup(e.target.value)} />
+              <Autocomplete onPlaceChanged={() => handlePlaceSelect(pickupRef, "pickup")}> 
+                <input 
+                  className="input" 
+                  placeholder="From (e.g., Udupi)" 
+                  ref={pickupRef} 
+                  value={pickup} 
+                  onChange={e => setPickup(e.target.value)} 
+                />
+              </Autocomplete>
             </div>
             <div className="input-group">
               <label>🏁 Drop Location</label>
-              <input className="input" placeholder="To (e.g., Mangalore)" value={drop} onChange={e => setDrop(e.target.value)} />
+              <Autocomplete onPlaceChanged={() => handlePlaceSelect(dropRef, "drop")}> 
+                <input 
+                  className="input" 
+                  placeholder="To (e.g., Mangalore)" 
+                  ref={dropRef} 
+                  value={drop} 
+                  onChange={e => setDrop(e.target.value)} 
+                />
+              </Autocomplete>
             </div>
             <div className="input-group">
               <label>📅 Date</label>
@@ -133,8 +199,10 @@ export default function RideBooking({ onBookNow }) {
             <div className="input-group">
               <label>📏 Distance (km)</label>
               <input
-                className="input" type="number" placeholder="e.g., 55" min="1"
-                value={distance} onChange={e => { setDistance(e.target.value); setEstimatedFare(null); }}
+                className="input" type="number" placeholder="Auto calculated..." min="1"
+                value={distance} 
+                onChange={e => { setDistance(e.target.value); setEstimatedFare(null); }}
+                disabled // Made disabled to prevent overriding the map calculation, or remove `disabled` to allow manual entry
               />
             </div>
           </div>
@@ -180,7 +248,7 @@ export default function RideBooking({ onBookNow }) {
               </div>
               <div className="badge">✓ Inclusive of all charges</div>
             </div>
-          )}
+          )} 
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
