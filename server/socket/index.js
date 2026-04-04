@@ -38,6 +38,16 @@ function initSocket(server) {
       startDriverSimulation(bookingId);
     });
 
+    socket.on('sendMessage', ({ bookingId, message, senderName }) => {
+      if (!bookingId || !message) return;
+      const msg = {
+        text: message,
+        senderName: senderName || 'User',
+        timestamp: new Date().toISOString(),
+      };
+      io.to(`booking:${bookingId}`).emit('chatMessage', msg);
+    });
+
     socket.on('disconnect', () => {
       console.log('Socket disconnected:', socket.id);
     });

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { getBooking } from '../api/index.js';
 import { useSocket } from '../hooks/useSocket.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import toast from 'react-hot-toast';
 
 const STATUS_STEPS = [
@@ -93,11 +94,20 @@ export default function Track() {
   const [activeBookingId, setActiveBookingId] = useState('');
   const [bookingInfo, setBookingInfo] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const messagesEndRef = useRef(null);
 
-  const { driverLocation, bookingStatus, connected } = useSocket(activeBookingId);
+  const { user } = useAuth();
+  const { driverLocation, bookingStatus, connected, messages, sendMessage } = useSocket(activeBookingId);
 
   const currentStatusKey = bookingStatus || bookingInfo?.booking?.status || null;
   const currentStepIndex = currentStatusKey ? STATUS_ORDER.indexOf(currentStatusKey) : -1;
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleTrack = async () => {
     if (!inputId.trim()) { toast.error('Please enter a booking ID'); return; }
@@ -126,10 +136,33 @@ export default function Track() {
         status: 'en_route',
         fare: 850,
         date: new Date().toISOString(),
+        driver: {
+          name: 'Ravi Kumar',
+          phone: '+919731470096',
+          carType: 'dzire',
+          carNumber: 'KA-20 AB 1234',
+          rating: 4.8,
+        },
       }
     });
     toast.success('Demo tracking started!');
   };
+
+  const handleSendMessage = () => {
+    const text = chatInput.trim();
+    if (!text) return;
+    const senderName = user?.name || 'Customer';
+    sendMessage(text, senderName);
+    setChatInput('');
+  };
+
+  const driver = bookingInfo?.booking?.driver;
+  const driverPhone = driver?.phone;
+  const driverName = driver?.name || 'Your Driver';
+  const driverCarInfo = driver
+    ? `${driver.carNumber || ''} · ${driver.carType || ''}`
+    : '';
+  const driverRating = driver?.rating != null ? driver.rating.toFixed(1) : '4.8';
 
   const glassCard = {
     background: 'rgba(8,18,42,0.75)',
@@ -260,15 +293,70 @@ export default function Track() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <div style={{ fontSize: '2.5rem', filter: 'drop-shadow(0 0 10px rgba(0,212,255,0.3))' }}>🧑‍✈️</div>
                   <div>
-                    <div style={{ fontWeight: 700, fontFamily: 'Rajdhani, sans-serif', fontSize: '1rem' }}>Ravi Kumar</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif' }}>KA-20 AB 1234 · Dzire</div>
-                    <div style={{ color: '#ffaa00', fontSize: '0.82rem' }}>★★★★★ 4.8</div>
+                    <div style={{ fontWeight: 700, fontFamily: 'Rajdhani, sans-serif', fontSize: '1rem' }}>{driverName}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif', textTransform: 'capitalize' }}>{driverCarInfo}</div>
+                    <div style={{ color: '#ffaa00', fontSize: '0.82rem' }}>{'★'.repeat(Math.round(parseFloat(driverRating)))} {driverRating}</div>
                   </div>
-                  <a href="tel:+919731470096" style={{ marginLeft: 'auto' }}>
-                    <button className="btn btn-secondary" style={{ padding: '0.45rem 0.875rem', fontSize: '0.75rem' }}>
-                      📞 Call
-                    </button>
-                  </a>
+                  {driverPhone && (
+                    <a href={`tel:${driverPhone}`} style={{ marginLeft: 'auto', textDecoration: 'none' }}>
+                      <button className="btn btn-secondary" style={{ padding: '0.45rem 0.875rem', fontSize: '0.75rem' }}>
+                        📞 Call Driver
+                      </button>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Chat Box */}
+              <div style={{ ...glassCard, marginTop: '1rem', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, var(--primary), transparent)' }} />
+                <h4 style={{ marginBottom: '0.875rem', fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em' }}>💬 Chat with Driver</h4>
+                <div style={{
+                  height: '180px', overflowY: 'auto', marginBottom: '0.75rem',
+                  background: 'rgba(0,0,0,0.2)', borderRadius: '0.5rem', padding: '0.75rem',
+                  display: 'flex', flexDirection: 'column', gap: '0.5rem',
+                }}>
+                  {messages.length === 0 ? (
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', textAlign: 'center', margin: 'auto', fontFamily: 'Rajdhani, sans-serif' }}>
+                      No messages yet. Say hello! 👋
+                    </p>
+                  ) : (
+                    messages.map((msg, idx) => {
+                      const isOwn = msg.senderName === (user?.name || 'Customer');
+                      return (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start' }}>
+                          <div style={{
+                            background: isOwn ? 'rgba(0,212,255,0.15)' : 'rgba(0,255,136,0.1)',
+                            border: `1px solid ${isOwn ? 'rgba(0,212,255,0.3)' : 'rgba(0,255,136,0.2)'}`,
+                            borderRadius: isOwn ? '0.75rem 0.75rem 0 0.75rem' : '0.75rem 0.75rem 0.75rem 0',
+                            padding: '0.4rem 0.75rem',
+                            maxWidth: '80%',
+                          }}>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif', marginBottom: '0.1rem' }}>{msg.senderName}</div>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--text-light)', wordBreak: 'break-word' }}>{msg.text}</div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    className="input"
+                    style={{ flex: 1, fontSize: '0.82rem', padding: '0.5rem 0.75rem' }}
+                    placeholder="Type a message…"
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                  />
+                  <button
+                    className="btn btn-primary"
+                    style={{ padding: '0.5rem 0.875rem', fontSize: '0.78rem', fontWeight: 700 }}
+                    onClick={handleSendMessage}
+                  >
+                    Send
+                  </button>
                 </div>
               </div>
             </div>

@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 export function useSocket(bookingId) {
   const [driverLocation, setDriverLocation] = useState(null);
   const [bookingStatus, setBookingStatus] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [messages, setMessages] = useState([]);
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -33,10 +34,20 @@ export function useSocket(bookingId) {
       setBookingStatus(data.status);
     });
 
+    socket.on('chatMessage', (msg) => {
+      setMessages(prev => [...prev, msg]);
+    });
+
     return () => {
       socket.disconnect();
     };
   }, [bookingId]);
 
-  return { driverLocation, bookingStatus, connected };
+  const sendMessage = useCallback((message, senderName) => {
+    if (socketRef.current?.connected && bookingId && message) {
+      socketRef.current.emit('sendMessage', { bookingId, message, senderName });
+    }
+  }, [bookingId]);
+
+  return { driverLocation, bookingStatus, connected, messages, sendMessage };
 }
