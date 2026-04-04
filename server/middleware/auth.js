@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Driver = require('../models/Driver');
 
 const jwtSecret = () => {
   const secret = process.env.JWT_SECRET;
@@ -28,6 +29,30 @@ const protect = async (req, res, next) => {
   }
 };
 
+const protectDriver = async (req, res, next) => {
+  try {
+    let token = req.cookies?.driverAccessToken;
+    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+    if (!token) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    const decoded = jwt.verify(token, jwtSecret());
+    if (decoded.role !== 'driver') {
+      return res.status(401).json({ message: 'Not a driver token' });
+    }
+    const driver = await Driver.findById(decoded.id).select('-otp -otpExpiry');
+    if (!driver) {
+      return res.status(401).json({ message: 'Driver not found' });
+    }
+    req.driver = driver;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+};
+
 const optionalAuth = async (req, res, next) => {
   try {
     let token = req.cookies?.accessToken;
@@ -43,4 +68,4 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
-module.exports = { protect, optionalAuth };
+module.exports = { protect, protectDriver, optionalAuth };

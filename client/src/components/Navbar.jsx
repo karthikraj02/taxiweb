@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-export default function Navbar({ onAuthClick }) {
+export default function Navbar({ onAuthClick, onDriverAuthClick }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
@@ -124,6 +124,13 @@ export default function Navbar({ onAuthClick }) {
           ) : (
             <>
               <button
+                onClick={onDriverAuthClick}
+                className="btn btn-outline"
+                style={{ padding: '0.45rem 1.1rem', fontSize: '0.78rem' }}
+              >
+                🚖 Driver
+              </button>
+              <button
                 onClick={onAuthClick}
                 className="btn btn-secondary"
                 style={{ padding: '0.45rem 1.1rem', fontSize: '0.78rem' }}
@@ -185,13 +192,22 @@ export default function Navbar({ onAuthClick }) {
             </button>
           ))}
           {!isAuthenticated && (
-            <button
-              onClick={() => { onAuthClick(); setMobileMenuOpen(false); }}
-              className="btn btn-primary"
-              style={{ marginTop: '0.75rem', justifyContent: 'center' }}
-            >
-              Login / Register
-            </button>
+            <>
+              <button
+                onClick={() => { onDriverAuthClick(); setMobileMenuOpen(false); }}
+                className="btn btn-outline"
+                style={{ marginTop: '0.5rem', justifyContent: 'center' }}
+              >
+                🚖 Driver Login / Register
+              </button>
+              <button
+                onClick={() => { onAuthClick(); setMobileMenuOpen(false); }}
+                className="btn btn-primary"
+                style={{ marginTop: '0.5rem', justifyContent: 'center' }}
+              >
+                Login / Register
+              </button>
+            </>
           )}
         </div>
       )}

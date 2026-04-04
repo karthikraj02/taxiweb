@@ -7,3 +7,5 @@ client/.env
 server/.env
 *.log
 .DS_Store
+server/uploads/*
+!server/uploads/.gitkeep

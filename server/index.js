@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 const rateLimit = require('express-rate-limit');
 const { doubleCsrf } = require('csrf-csrf');
 const connectDB = require('./config/db');
@@ -16,6 +17,7 @@ const bookingRoutes = require('./routes/bookings');
 const pricingRoutes = require('./routes/pricing');
 const paymentRoutes = require('./routes/payments');
 const driverRoutes = require('./routes/drivers');
+const driverAuthRoutes = require('./routes/driverAuth');
 
 const app = express();
 const server = http.createServer(app);
@@ -23,7 +25,9 @@ const server = http.createServer(app);
 connectDB();
 initSocket(server);
 
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true
@@ -31,6 +35,9 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET || (process.env.NODE_ENV === 'production' ? undefined : 'cookie_secret_dev')));
+
+// Serve uploaded driver photos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // General API rate limiter (100 req / 15 min per IP)
 const apiLimiter = rateLimit({
@@ -68,6 +75,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/drivers', driverRoutes);
+app.use('/api/driver-auth', driverAuthRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
