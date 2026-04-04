@@ -38,9 +38,10 @@ function initSocket(server) {
       startDriverSimulation(bookingId);
     });
 
-    socket.on('sendMessage', ({ bookingId, message, senderName }) => {
+    socket.on('sendMessage', ({ bookingId, message, senderName, msgId }) => {
       if (!bookingId || !message) return;
       const msg = {
+        msgId: msgId || null,
         text: message,
         senderName: senderName || 'User',
         timestamp: new Date().toISOString(),

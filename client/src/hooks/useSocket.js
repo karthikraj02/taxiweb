@@ -7,6 +7,7 @@ export function useSocket(bookingId) {
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState([]);
   const socketRef = useRef(null);
+  const sentMsgIds = useRef(new Set());
 
   useEffect(() => {
     if (!bookingId) return;
@@ -45,9 +46,11 @@ export function useSocket(bookingId) {
 
   const sendMessage = useCallback((message, senderName) => {
     if (socketRef.current?.connected && bookingId && message) {
-      socketRef.current.emit('sendMessage', { bookingId, message, senderName });
+      const msgId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      sentMsgIds.current.add(msgId);
+      socketRef.current.emit('sendMessage', { bookingId, message, senderName, msgId });
     }
   }, [bookingId]);
 
-  return { driverLocation, bookingStatus, connected, messages, sendMessage };
+  return { driverLocation, bookingStatus, connected, messages, sendMessage, sentMsgIds };
 }

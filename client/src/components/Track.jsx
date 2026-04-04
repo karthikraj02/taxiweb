@@ -98,7 +98,7 @@ export default function Track() {
   const messagesEndRef = useRef(null);
 
   const { user } = useAuth();
-  const { driverLocation, bookingStatus, connected, messages, sendMessage } = useSocket(activeBookingId);
+  const { driverLocation, bookingStatus, connected, messages, sendMessage, sentMsgIds } = useSocket(activeBookingId);
 
   const currentStatusKey = bookingStatus || bookingInfo?.booking?.status || null;
   const currentStepIndex = currentStatusKey ? STATUS_ORDER.indexOf(currentStatusKey) : -1;
@@ -159,10 +159,10 @@ export default function Track() {
   const driver = bookingInfo?.booking?.driver;
   const driverPhone = driver?.phone;
   const driverName = driver?.name || 'Your Driver';
-  const driverCarInfo = driver
-    ? `${driver.carNumber || ''} · ${driver.carType || ''}`
-    : '';
-  const driverRating = driver?.rating != null ? driver.rating.toFixed(1) : '4.8';
+  const carInfoParts = driver ? [driver.carNumber, driver.carType].filter(Boolean) : [];
+  const driverCarInfo = carInfoParts.join(' · ');
+  const driverRating = driver?.rating != null ? driver.rating.toFixed(1) : 'N/A';
+  const driverStars = driver?.rating != null ? Math.floor(driver.rating) : 0;
 
   const glassCard = {
     background: 'rgba(8,18,42,0.75)',
@@ -295,7 +295,7 @@ export default function Track() {
                   <div>
                     <div style={{ fontWeight: 700, fontFamily: 'Rajdhani, sans-serif', fontSize: '1rem' }}>{driverName}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif', textTransform: 'capitalize' }}>{driverCarInfo}</div>
-                    <div style={{ color: '#ffaa00', fontSize: '0.82rem' }}>{'★'.repeat(Math.round(parseFloat(driverRating)))} {driverRating}</div>
+                    <div style={{ color: '#ffaa00', fontSize: '0.82rem' }}>{'★'.repeat(driverStars)}{driverRating !== 'N/A' ? ` ${driverRating}` : ' N/A'}</div>
                   </div>
                   {driverPhone && (
                     <a href={`tel:${driverPhone}`} style={{ marginLeft: 'auto', textDecoration: 'none' }}>
@@ -322,7 +322,9 @@ export default function Track() {
                     </p>
                   ) : (
                     messages.map((msg, idx) => {
-                      const isOwn = msg.senderName === (user?.name || 'Customer');
+                      const isOwn = msg.msgId
+                        ? sentMsgIds.current.has(msg.msgId)
+                        : msg.senderName === (user?.name || 'Customer');
                       return (
                         <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start' }}>
                           <div style={{
