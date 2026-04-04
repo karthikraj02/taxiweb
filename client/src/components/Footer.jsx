@@ -201,7 +201,9 @@ export default function Footer() {
             © 2024 Udupi Taxi. All rights reserved.
           </span>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontFamily: 'Rajdhani, sans-serif' }}>
-            Made with <span style={{ color: 'var(--danger)' }}>❤️</span> in Udupi, Karnataka
+            <a href="https://beautiful-alpaca-6b1495.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+              Made with <span style={{ color: 'var(--danger)' }}>❤️</span> in Udupi, Karnataka
+            </a>
           </span>
         </div>
       </div>

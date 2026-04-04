@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import etiosImg from '../img/etios.png';
+import dzireImg from '../img/maruti_desire.png';
+import innovaImg from '../img/toyota_innova.png';
+import tempoImg from '../img/tt.png';
 import { useAuth } from '../context/AuthContext.jsx';
 import { estimateFare, createBooking, createPaymentOrder, verifyPayment } from '../api/index.js';
 import toast from 'react-hot-toast';
 
 const CAR_TYPES = [
-  { id: 'etios', label: 'Toyota Etios', emoji: '🚗', rate: '₹12/km', min: '₹600' },
-  { id: 'dzire', label: 'Maruti Dzire', emoji: '🚙', rate: '₹13/km', min: '₹650' },
-  { id: 'innova', label: 'Toyota Innova', emoji: '🚐', rate: '₹18/km', min: '₹1100' },
-  { id: 'tempo', label: 'Tempo Traveller', emoji: '🚌', rate: '₹25/km', min: '₹2500' },
+  { id: 'etios', label: 'Toyota Etios', image: etiosImg, rate: '₹12/km', min: '₹600' },
+  { id: 'dzire', label: 'Maruti Dzire', image: dzireImg, rate: '₹13/km', min: '₹650' },
+  { id: 'innova', label: 'Toyota Innova', image: innovaImg, rate: '₹18/km', min: '₹1100' },
+  { id: 'tempo', label: 'Tempo Traveller', image: tempoImg, rate: '₹25/km', min: '₹2500' },
 ];
 
 const STEPS = ['Trip Details', 'Fare Summary', 'Payment', 'Confirmation'];
@@ -208,7 +212,9 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
               {CAR_TYPES.map(c => (
                 <button key={c.id} onClick={() => { setForm(p => ({ ...p, carType: c.id })); setFare(null); }} style={{ padding: '0.6rem', borderRadius: '0.5rem', border: form.carType === c.id ? '2px solid var(--primary)' : '2px solid var(--border)', background: form.carType === c.id ? 'rgba(245,158,11,0.1)' : 'var(--bg-dark)', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', color: 'var(--text-light)', fontFamily: 'Poppins, sans-serif' }}>
-                  <div style={{ fontSize: '1.25rem' }}>{c.emoji}</div>
+                  <div style={{ height: '32px', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={c.image} alt={c.label} style={{ height: '100%', objectFit: 'contain' }} />
+                  </div>
                   <div style={{ fontSize: '0.75rem', fontWeight: 600 }}>{c.label.split(' ')[1]}</div>
                   <div style={{ fontSize: '0.65rem', color: 'var(--primary)' }}>{c.rate}</div>
                 </button>

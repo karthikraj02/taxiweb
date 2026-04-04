@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import marutiImg from '../img/maruti_desire.png';
 
 const STATS = [
   { value: '500+', label: 'Happy Rides' },
@@ -226,12 +227,16 @@ export default function Hero({ onBookNow }) {
               }} />
 
               <div className="animate-bounce" style={{
-                fontSize: 'clamp(5rem, 14vw, 9rem)',
-                lineHeight: 1, marginBottom: '1.5rem',
-                filter: 'drop-shadow(0 0 30px rgba(0,212,255,0.4)) drop-shadow(0 20px 40px rgba(0,0,0,0.5))',
+                marginBottom: '1.5rem',
                 position: 'relative', zIndex: 1,
+                display: 'flex', justifyContent: 'center'
               }}>
-                🚕
+                <img src={marutiImg} alt="Maruti Taxi" style={{
+                  width: '100%',
+                  maxWidth: '300px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 0 30px rgba(0,212,255,0.4)) drop-shadow(0 20px 40px rgba(0,0,0,0.5))'
+                }} />
               </div>
 
               <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', justifyContent: 'center', position: 'relative', zIndex: 1 }}>

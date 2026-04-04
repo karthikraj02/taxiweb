@@ -1,10 +1,14 @@
 import React from 'react';
+import etiosImg from '../img/etios.png';
+import dzireImg from '../img/maruti_desire.png';
+import innovaImg from '../img/toyota_innova.png';
+import tempoImg from '../img/tt.png';
 
 const CARS = [
   {
     id: 'etios',
     name: 'Toyota Etios',
-    emoji: '🚗',
+    image: etiosImg,
     seats: 4,
     luggage: '2 bags',
     rate: '₹12/km',
@@ -16,7 +20,7 @@ const CARS = [
   {
     id: 'dzire',
     name: 'Maruti Dzire',
-    emoji: '🚙',
+    image: dzireImg,
     seats: 4,
     luggage: '2 bags',
     rate: '₹13/km',
@@ -28,7 +32,7 @@ const CARS = [
   {
     id: 'innova',
     name: 'Toyota Innova',
-    emoji: '🚐',
+    image: innovaImg,
     seats: 7,
     luggage: '4 bags',
     rate: '₹18/km',
@@ -40,7 +44,7 @@ const CARS = [
   {
     id: 'tempo',
     name: 'Tempo Traveller',
-    emoji: '🚌',
+    image: tempoImg,
     seats: 12,
     luggage: '8 bags',
     rate: '₹25/km',
@@ -98,13 +102,21 @@ export default function Fleet({ onBookNow }) {
               }} />
 
               <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {/* Car Emoji with glow */}
+                {/* Car Image with glow */}
                 <div style={{
-                  textAlign: 'center', fontSize: '3.8rem',
-                  marginBottom: '0.875rem',
-                  filter: `drop-shadow(0 0 20px rgba(${car.accentRgb},0.5))`,
+                  textAlign: 'center',
+                  marginBottom: '1rem',
                 }}>
-                  {car.emoji}
+                  <img
+                    src={car.image}
+                    alt={car.name}
+                    style={{
+                      height: '85px',
+                      width: '100%',
+                      objectFit: 'contain',
+                      filter: `drop-shadow(0 0 15px rgba(${car.accentRgb},0.4))`,
+                    }}
+                  />
                 </div>
 
                 {/* Name */}

@@ -1,4 +1,8 @@
 import React, { useState, useRef } from 'react';
+import etiosImg from '../img/etios.png';
+import dzireImg from '../img/maruti_desire.png';
+import innovaImg from '../img/toyota_innova.png';
+import tempoImg from '../img/tt.png';
 import { estimateFare } from '../api/index.js';
 import toast from 'react-hot-toast';
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
@@ -6,10 +10,10 @@ import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 const libraries = ["places"];
 
 const CAR_TYPES = [
-  { id: 'etios', label: 'Toyota Etios', emoji: '🚗', rate: '₹12/km', min: '₹600' },
-  { id: 'dzire', label: 'Maruti Dzire', emoji: '🚙', rate: '₹13/km', min: '₹650' },
-  { id: 'innova', label: 'Toyota Innova', emoji: '🚐', rate: '₹18/km', min: '₹1100' },
-  { id: 'tempo', label: 'Tempo Traveller', emoji: '🚌', rate: '₹25/km', min: '₹2500' },
+  { id: 'etios', label: 'Toyota Etios', image: etiosImg, rate: '₹12/km', min: '₹600' },
+  { id: 'dzire', label: 'Maruti Dzire', image: dzireImg, rate: '₹13/km', min: '₹650' },
+  { id: 'innova', label: 'Toyota Innova', image: innovaImg, rate: '₹18/km', min: '₹1100' },
+  { id: 'tempo', label: 'Tempo Traveller', image: tempoImg, rate: '₹25/km', min: '₹2500' },
 ];
 
 const POPULAR_ROUTES = [
@@ -341,7 +345,9 @@ export default function RideBooking({ onBookNow }) {
                     boxShadow: carType === car.id ? '0 0 15px rgba(0,212,255,0.15)' : 'none',
                   }}
                 >
-                  <div style={{ fontSize: '1.5rem', marginBottom: '0.3rem' }}>{car.emoji}</div>
+                  <div style={{ marginBottom: '0.4rem', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={car.image} alt={car.label} style={{ height: '100%', objectFit: 'contain' }} />
+                  </div>
                   <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.15rem', letterSpacing: '0.04em' }}>{car.label}</div>
                   <div style={{ fontSize: '0.68rem', color: 'var(--primary)', fontWeight: 600 }}>{car.rate} · Min {car.min}</div>
                 </button>
