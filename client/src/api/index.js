@@ -10,7 +10,7 @@ let csrfToken = null;
 const getCsrfToken = async () => {
   if (!csrfToken) {
     try {
-      const { data } = await axios.get('/api/csrf-token', { withCredentials: true });
+      const { data } = await api.get('/api/csrf-token');
       csrfToken = data.csrfToken;
     } catch (err) {
       console.debug('CSRF token fetch failed (will proceed without it):', err.message);
