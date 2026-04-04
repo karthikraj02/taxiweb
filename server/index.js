@@ -44,11 +44,11 @@ const apiLimiter = rateLimit({
 // CSRF protection using double-submit cookie pattern
 const { generateCsrfToken, doubleCsrfProtection } = doubleCsrf({
   getSecret: () => process.env.JWT_SECRET || 'csrf_secret_dev',
-  getSessionIdentifier: (req) => req.ip || 'anonymous',
+  getSessionIdentifier: () => 'common_session', // Stable identifier for cross-site cookie comparison
   cookieName: 'x-csrf-token',
   cookieOptions: {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     secure: process.env.NODE_ENV === 'production',
   },
   size: 64,
