@@ -10,12 +10,14 @@ import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
 import BookingModal from './components/BookingModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
+import DriverAuthModal from './components/DriverAuthModal.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 
 export default function App() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDriverAuthModal, setShowDriverAuthModal] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
   const [bookingData, setBookingData] = useState(null);
   const { user } = useAuth();
@@ -29,7 +31,7 @@ export default function App() {
   return (
     <>
       <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(8,18,42,0.95)', color: '#e0f4ff', border: '1px solid rgba(0,212,255,0.2)', backdropFilter: 'blur(12px)', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 } }} />
-      <Navbar onAuthClick={() => setShowAuthModal(true)} />
+      <Navbar onAuthClick={() => setShowAuthModal(true)} onDriverAuthClick={() => setShowDriverAuthModal(true)} />
       <main>
         <section id="home"><Hero onBookNow={() => openBooking()} /></section>
         <section id="ride"><RideBooking onBookNow={openBooking} /></section>
@@ -73,6 +75,9 @@ export default function App() {
       )}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
+      {showDriverAuthModal && (
+        <DriverAuthModal onClose={() => setShowDriverAuthModal(false)} />
       )}
     </>
   );

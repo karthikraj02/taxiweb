@@ -92,4 +92,11 @@ export const getDrivers = (carType) =>
 export const updateBookingStatus = (id, status) =>
   api.put(`/api/bookings/${id}/status`, { status });
 
+export const driverRequestOTP = (email) => api.post('/api/driver-auth/request-otp', { email });
+export const driverVerifyOTP = (email, otp) => api.post('/api/driver-auth/verify-otp', { email, otp });
+export const driverRegister = (formData) =>
+  api.post('/api/driver-auth/register', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const driverLogout = () => api.post('/api/driver-auth/logout');
+export const getDriverMe = () => api.get('/api/driver-auth/me');
+
 export default api;
