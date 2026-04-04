@@ -101,4 +101,10 @@ export const driverRegister = (formData) =>
 export const driverLogout = () => api.post('/api/driver-auth/logout');
 export const getDriverMe = () => api.get('/api/driver-auth/me');
 
+export const getDriverRequests = () => api.get('/api/driver/requests');
+export const acceptBookingRequest = (id) => api.post(`/api/driver/requests/${id}/accept`);
+export const rejectBookingRequest = (id) => api.post(`/api/driver/requests/${id}/reject`);
+export const getDriverStats = () => api.get('/api/driver/stats');
+export const getDriverActiveRide = () => api.get('/api/driver/active-ride');
+
 export default api;

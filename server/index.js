@@ -18,6 +18,7 @@ const pricingRoutes = require('./routes/pricing');
 const paymentRoutes = require('./routes/payments');
 const driverRoutes = require('./routes/drivers');
 const driverAuthRoutes = require('./routes/driverAuth');
+const driverDashboardRoutes = require('./routes/driverDashboard');
 
 const app = express();
 const server = http.createServer(app);
@@ -76,6 +77,7 @@ app.use('/api/pricing', pricingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/driver-auth', driverAuthRoutes);
+app.use('/api/driver', driverDashboardRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 

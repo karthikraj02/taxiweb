@@ -12,7 +12,9 @@ import BookingModal from './components/BookingModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import DriverAuthModal from './components/DriverAuthModal.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
+import DriverDashboard from './components/DriverDashboard.jsx';
 import { useAuth } from './context/AuthContext.jsx';
+import { useDriver } from './context/DriverContext.jsx';
 
 export default function App() {
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -21,6 +23,17 @@ export default function App() {
   const [selectedCar, setSelectedCar] = useState(null);
   const [bookingData, setBookingData] = useState(null);
   const { user } = useAuth();
+  const { driver, loading: driverLoading } = useDriver();
+
+  // Show driver dashboard when a driver is authenticated
+  if (!driverLoading && driver) {
+    return (
+      <>
+        <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(8,18,42,0.95)', color: '#e0f4ff', border: '1px solid rgba(0,212,255,0.2)', backdropFilter: 'blur(12px)', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 } }} />
+        <DriverDashboard />
+      </>
+    );
+  }
 
   const openBooking = (carType = null, data = null) => {
     setSelectedCar(carType);
