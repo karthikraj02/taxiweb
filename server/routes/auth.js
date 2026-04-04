@@ -30,12 +30,17 @@ const generateTokens = async (user) => {
 
 const setTokenCookies = (res, accessToken, refreshToken) => {
   const isProduction = process.env.NODE_ENV === 'production';
+  const cookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+  };
   res.cookie('accessToken', accessToken, {
-    httpOnly: true, secure: isProduction, sameSite: 'lax',
+    ...cookieOptions,
     maxAge: 15 * 60 * 1000
   });
   res.cookie('refreshToken', refreshToken, {
-    httpOnly: true, secure: isProduction, sameSite: 'lax',
+    ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 };
