@@ -5,6 +5,8 @@ const { getIO } = require('../socket');
 
 const router = express.Router();
 
+const ACTIVE_RIDE_STATUSES = ['driver_assigned', 'en_route', 'arrived', 'in_progress'];
+
 router.use(protectDriver);
 
 // GET /api/driver/requests
@@ -59,7 +61,9 @@ router.post('/requests/:id/accept', async (req, res, next) => {
 });
 
 // POST /api/driver/requests/:id/reject
-// Removes the driver from a booking and resets status to pending
+// Removes the driver from a booking and resets status to pending.
+// Matches bookings that are either still pending (driver hasn't accepted yet)
+// or driver_assigned but assigned to this driver (driver wants to un-accept).
 router.post('/requests/:id/reject', async (req, res, next) => {
   try {
     const booking = await Booking.findOne({
@@ -90,7 +94,7 @@ router.get('/stats', async (req, res, next) => {
     });
     const activeRide = await Booking.findOne({
       driver: req.driver._id,
-      status: { $in: ['driver_assigned', 'en_route', 'arrived', 'in_progress'] },
+      status: { $in: ACTIVE_RIDE_STATUSES },
     })
       .sort({ createdAt: -1 })
       .populate('user', 'name phone email');
@@ -107,7 +111,7 @@ router.get('/active-ride', async (req, res, next) => {
   try {
     const activeRide = await Booking.findOne({
       driver: req.driver._id,
-      status: { $in: ['driver_assigned', 'en_route', 'arrived', 'in_progress'] },
+      status: { $in: ACTIVE_RIDE_STATUSES },
     })
       .sort({ createdAt: -1 })
       .populate('user', 'name phone email');

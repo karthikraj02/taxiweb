@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useDriver } from '../context/DriverContext.jsx';
 import {
   getDriverRequests,
@@ -47,7 +47,7 @@ export default function DriverDashboard() {
     }
   };
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setLoadingStats(true);
     try {
       const { data } = await getDriverStats();
@@ -58,7 +58,7 @@ export default function DriverDashboard() {
     } finally {
       setLoadingStats(false);
     }
-  };
+  }, []);
 
   // Set up socket for active ride chat
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function DriverDashboard() {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [activeRide?.bookingId]);
+  }, [activeRide?.bookingId, fetchStats]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function DriverDashboard() {
   const handleSendMessage = () => {
     const text = chatInput.trim();
     if (!text || !activeRide || !socketRef.current) return;
-    const msgId = `${Date.now()}-driver`;
+    const msgId = crypto.randomUUID();
     socketRef.current.emit('sendMessage', {
       bookingId: activeRide.bookingId,
       message: text,
