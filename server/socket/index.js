@@ -38,6 +38,11 @@ function initSocket(server) {
       startDriverSimulation(bookingId);
     });
 
+    socket.on('driverJoinBookingRoom', (bookingId) => {
+      socket.join(`booking:${bookingId}`);
+      socket.emit('joinedRoom', { bookingId });
+    });
+
     socket.on('sendMessage', ({ bookingId, message, senderName, msgId }) => {
       if (!bookingId || !message) return;
       const msg = {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { driverRegister, driverRequestOTP, driverVerifyOTP } from '../api/index.js';
+import { useDriver } from '../context/DriverContext.jsx';
 import toast from 'react-hot-toast';
 
 const CAR_TYPES = [
@@ -10,6 +11,7 @@ const CAR_TYPES = [
 ];
 
 export default function DriverAuthModal({ onClose, onLoginSuccess }) {
+  const { loginDriver } = useDriver();
   const [activeTab, setActiveTab] = useState('login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -65,6 +67,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
     try {
       const { data } = await driverVerifyOTP(loginEmail, otpCode);
       toast.success(`Welcome, ${data.driver?.name || 'Driver'}!`);
+      loginDriver(data.driver);
       if (onLoginSuccess) onLoginSuccess(data.driver);
       onClose();
     } catch (err) {
