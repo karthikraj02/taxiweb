@@ -24,6 +24,18 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/all', protect, async (req, res, next) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    const drivers = await Driver.find({}).sort({ createdAt: -1 });
+    res.json({ drivers });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const driver = await Driver.findById(req.params.id);
