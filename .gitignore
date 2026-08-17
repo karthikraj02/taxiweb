@@ -1,0 +1,26 @@
+node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
+coverage/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+client/.env
+client/.env.*
+!client/.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Uploaded documents contain driver PII and must never be committed.
+server/uploads/*
+!server/uploads/.gitkeep
+
+*.log
+npm-debug.log*
+.DS_Store
+.vscode/
+.idea/
