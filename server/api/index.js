@@ -12,6 +12,11 @@
  *  - The disk is read-only/ephemeral, so uploaded driver documents are not kept.
  * Host index.js on a regular Node service (Render, Railway, Fly) for those.
  */
+// Anything running on Vercel is a deployed environment. Force production mode
+// BEFORE config/env loads, so secure cookies, CSRF settings and the production
+// config checks apply even if NODE_ENV was mis-set or left unset in the dashboard.
+if (process.env.VERCEL) process.env.NODE_ENV = 'production';
+
 const mongoose = require('mongoose');
 const env = require('../config/env');
 const logger = require('../utils/logger');

@@ -14,7 +14,16 @@ import axios from 'axios';
  *    a session change and every mutation started failing.
  */
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+/**
+ * Same-origin API calls.
+ *
+ * The browser only ever talks to the site it loaded from. In production the
+ * host forwards `/api/*` to the backend (see vercel.json); in development the
+ * Vite dev server does (see vite.config.js). That keeps the auth and CSRF
+ * cookies first-party, so login works in Safari, Firefox strict mode and
+ * private windows, which block cookies set by a different site.
+ */
+const baseURL = '';
 
 const api = axios.create({
   baseURL,

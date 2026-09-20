@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Same origin by default (the dev server proxies /socket.io). Set
+// VITE_SOCKET_URL only if realtime runs on a separate host.
+const API_URL = import.meta.env.VITE_SOCKET_URL || '';
 
 /**
  * Realtime booking channel.

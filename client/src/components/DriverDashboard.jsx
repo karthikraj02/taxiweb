@@ -10,7 +10,9 @@ import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { Logo } from './Icons.jsx';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Same origin by default (the dev server proxies /socket.io). Set
+// VITE_SOCKET_URL only if realtime runs on a separate host.
+const API_URL = import.meta.env.VITE_SOCKET_URL || '';
 
 /** The next action available at each stage of a ride. */
 const NEXT_ACTION = {
