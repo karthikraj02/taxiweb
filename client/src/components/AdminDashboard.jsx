@@ -96,19 +96,19 @@ export default function AdminDashboard() {
     return (
       <div className="section">
         <div className="container" style={{ textAlign: 'center', padding: '5rem' }}>
-          <p style={{ color: '#fca5a5', marginBottom: '1rem' }}>{error}</p>
-          <button className="btn btn-primary" onClick={fetchData}>Try again</button>
+          <p style={{ color: 'var(--danger)', marginBottom: '1rem' }}>{error}</p>
+          <button className="btn btn-dark" onClick={fetchData}>Try again</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="section" style={{ background: 'var(--bg-dark)', minHeight: '100vh' }}>
+    <div className="section" style={{ background: 'var(--bg-soft)', minHeight: '60vh' }}>
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <h2 className="section-title" style={{ margin: 0 }}>Admin <span>Dashboard</span></h2>
-          <button className="btn btn-primary" onClick={fetchData}>🔄 Refresh</button>
+          <button className="btn btn-dark" onClick={fetchData}>Refresh</button>
         </div>
 
         {/* Tab Navigation */}
@@ -136,10 +136,10 @@ export default function AdminDashboard() {
                 ['Today', stats?.bookings?.today ?? '—', 'var(--primary)'],
                 ['Active Rides', stats?.bookings?.active ?? '—', 'var(--accent)'],
                 ['Completed', stats?.bookings?.completed ?? '—', 'var(--accent)'],
-                ['Cancelled', stats?.bookings?.cancelled ?? '—', '#f87171'],
+                ['Cancelled', stats?.bookings?.cancelled ?? '—', 'var(--danger)'],
                 ['Revenue', stats ? `₹${(stats.revenue?.totalPaid || 0).toLocaleString()}` : '—', 'var(--accent)'],
                 ['Drivers Online', stats?.drivers?.online ?? '—', 'var(--primary)'],
-                ['Pending Approvals', stats?.drivers?.pendingApprovals ?? '—', '#fbbf24'],
+                ['Pending Approvals', stats?.drivers?.pendingApprovals ?? '—', 'var(--warn)'],
               ].map(([label, value, color]) => (
                 <div key={label} className="card" style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{label}</div>
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
             <div className="card" style={{ overflowX: 'auto', padding: '0' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-soft)' }}>
                     <th style={{ padding: '1rem' }}>ID</th>
                     <th style={{ padding: '1rem' }}>Customer</th>
                     <th style={{ padding: '1rem' }}>Route</th>
@@ -201,8 +201,8 @@ export default function AdminDashboard() {
                       <td style={{ padding: '1rem' }}>
                         <span style={{
                           padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: 600,
-                          background: b.status === 'pending' ? 'rgba(245,158,11,0.1)' : b.status === 'completed' ? 'rgba(16,185,129,0.1)' : 'rgba(148,163,184,0.1)',
-                          color: b.status === 'pending' ? '#fbbf24' : b.status === 'completed' ? 'var(--accent)' : 'var(--text-muted)'
+                          background: b.status === 'pending' ? 'var(--brand-soft)' : b.status === 'completed' ? 'var(--success-soft)' : 'var(--bg-soft)',
+                          color: b.status === 'pending' ? '#7a5600' : b.status === 'completed' ? 'var(--success)' : 'var(--text-muted)'
                         }}>
                           {b.status}
                         </span>
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
           <div className="card" style={{ overflowX: 'auto', padding: '0' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
+                <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-soft)' }}>
                   <th style={{ padding: '1rem' }}>Name</th>
                   <th style={{ padding: '1rem' }}>Contact</th>
                   <th style={{ padding: '1rem' }}>Vehicle</th>
@@ -267,19 +267,19 @@ export default function AdminDashboard() {
                       {driver.carType}<br />
                       <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{driver.carNumber}</span>
                     </td>
-                    <td style={{ padding: '1rem', color: '#fbbf24' }}>
+                    <td style={{ padding: '1rem', color: 'var(--warn)' }}>
                       ★ {driver.rating != null ? driver.rating.toFixed(1) : 'N/A'} <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>({driver.ratingCount || 0})</span>
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                         <span style={{
                           padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
-                          background: driver.approvalStatus === 'approved' ? 'rgba(6,95,70,0.4)'
-                            : driver.approvalStatus === 'suspended' || driver.approvalStatus === 'rejected' ? 'rgba(127,29,29,0.4)'
-                            : 'rgba(120,53,15,0.4)',
-                          color: driver.approvalStatus === 'approved' ? '#34d399'
-                            : driver.approvalStatus === 'suspended' || driver.approvalStatus === 'rejected' ? '#fca5a5'
-                            : '#fbbf24',
+                          background: driver.approvalStatus === 'approved' ? 'var(--success-soft)'
+                            : driver.approvalStatus === 'suspended' || driver.approvalStatus === 'rejected' ? 'var(--danger-soft)'
+                            : 'var(--brand-soft)',
+                          color: driver.approvalStatus === 'approved' ? 'var(--success)'
+                            : driver.approvalStatus === 'suspended' || driver.approvalStatus === 'rejected' ? 'var(--danger)'
+                            : '#7a5600',
                           textAlign: 'center',
                         }}>
                           {driver.approvalStatus?.replace(/_/g, ' ')}
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
                           {driver.approvalStatus !== 'approved' && (
                             <button
                               onClick={() => decideDriver(driver.id, 'approved')}
-                              style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.35)', color: '#34d399', borderRadius: '0.3rem', padding: '0.2rem 0.5rem', fontSize: '0.7rem', cursor: 'pointer', fontFamily: 'inherit' }}
+                              style={{ background: 'var(--success-soft)', border: '1px solid #b6e0cc', color: 'var(--success)', borderRadius: '0.3rem', padding: '0.2rem 0.5rem', fontSize: '0.7rem', cursor: 'pointer', fontFamily: 'inherit' }}
                             >
                               Approve
                             </button>
@@ -300,7 +300,7 @@ export default function AdminDashboard() {
                           {driver.approvalStatus === 'approved' && (
                             <button
                               onClick={() => decideDriver(driver.id, 'suspended')}
-                              style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', borderRadius: '0.3rem', padding: '0.2rem 0.5rem', fontSize: '0.7rem', cursor: 'pointer', fontFamily: 'inherit' }}
+                              style={{ background: 'var(--danger-soft)', border: '1px solid #f3c1bc', color: 'var(--danger)', borderRadius: '0.3rem', padding: '0.2rem 0.5rem', fontSize: '0.7rem', cursor: 'pointer', fontFamily: 'inherit' }}
                             >
                               Suspend
                             </button>
@@ -308,7 +308,7 @@ export default function AdminDashboard() {
                           {driver.approvalStatus === 'pending_review' && (
                             <button
                               onClick={() => decideDriver(driver.id, 'rejected')}
-                              style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', borderRadius: '0.3rem', padding: '0.2rem 0.5rem', fontSize: '0.7rem', cursor: 'pointer', fontFamily: 'inherit' }}
+                              style={{ background: 'var(--danger-soft)', border: '1px solid #f3c1bc', color: 'var(--danger)', borderRadius: '0.3rem', padding: '0.2rem 0.5rem', fontSize: '0.7rem', cursor: 'pointer', fontFamily: 'inherit' }}
                             >
                               Reject
                             </button>

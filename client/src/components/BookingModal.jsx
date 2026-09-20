@@ -10,6 +10,7 @@ import {
 } from '../api/index.js';
 import { resolvePlace } from '../utils/geocode.js';
 import toast from 'react-hot-toast';
+import { Logo, Check } from './Icons.jsx';
 
 const CAR_TYPES = [
   { id: 'etios', label: 'Toyota Etios', image: etiosImg, rate: '₹12/km', min: '₹600' },
@@ -201,7 +202,7 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
         ondismiss: () => setError('Payment was cancelled. Your booking is saved and still awaiting payment.'),
       },
       prefill: { name: user?.name, email: user?.email, contact: user?.phone },
-      theme: { color: '#00d4ff' },
+      theme: { color: '#0f1b2d' },
     };
 
     const open = () => {
@@ -225,11 +226,11 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
     return (
       <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
         <div className="modal" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔐</div>
-          <h2 style={{ fontWeight: 700, marginBottom: '0.75rem' }}>Login Required</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Please login to book a ride</p>
+          <div className="logo-wrap" style={{ marginBottom: '1rem' }}><Logo size={48} /></div>
+          <h2 style={{ fontWeight: 700, marginBottom: '0.75rem' }}>Log in to continue</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Please log in to book a ride</p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
-            <button className="btn btn-primary" onClick={onAuthRequired} style={{ fontWeight: 600 }}>Login / Register</button>
+            <button className="btn btn-primary" onClick={onAuthRequired} style={{ fontWeight: 600 }}>Log in / Register</button>
             <button className="btn btn-outline" onClick={onClose}>Cancel</button>
           </div>
         </div>
@@ -241,21 +242,15 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: '600px' }}>
         {/* Close */}
-        <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'var(--text-light)', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
-        <h2 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: '1.5rem' }}>🚕 Book a Ride</h2>
+        <h2 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: '1.5rem' }}>Book a ride</h2>
 
         <StepIndicator current={step} />
 
         {/* Errors are surfaced, never swallowed. */}
         {error && (
-          <div role="alert" style={{
-            background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)',
-            color: '#fca5a5', borderRadius: '0.5rem', padding: '0.75rem 1rem',
-            marginBottom: '1rem', fontSize: '0.82rem',
-          }}>
-            {error}
-          </div>
+          <div className="alert-error" role="alert">{error}</div>
         )}
 
         {/* Step 0: Trip Details */}
@@ -263,23 +258,23 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label>📍 Pickup</label>
+                <label>Pickup</label>
                 <input className="input" placeholder="From" value={form.pickup} onChange={e => setForm(p => ({ ...p, pickup: e.target.value }))} />
               </div>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label>🏁 Drop</label>
+                <label>Drop</label>
                 <input className="input" placeholder="To" value={form.drop} onChange={e => setForm(p => ({ ...p, drop: e.target.value }))} />
               </div>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label>📅 Date</label>
+                <label>Date</label>
                 <input className="input" type="date" min={today} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
               </div>
               <div className="input-group" style={{ marginBottom: 0 }}>
-                <label>⏰ Time</label>
+                <label>Time</label>
                 <input className="input" type="time" value={form.time} onChange={e => setForm(p => ({ ...p, time: e.target.value }))} />
               </div>
               <div className="input-group" style={{ gridColumn: '1/-1', marginBottom: 0 }}>
-                <label htmlFor="modal-passengers">👥 Passengers</label>
+                <label htmlFor="modal-passengers">Passengers</label>
                 <input
                   id="modal-passengers"
                   className="input" type="number" min="1" max="12"
@@ -292,8 +287,8 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
             {/* Trip Type */}
             <div style={{ display: 'flex', gap: '0.5rem', margin: '1rem 0' }}>
               {['one-way', 'round-trip'].map(t => (
-                <button key={t} onClick={() => { setForm(p => ({ ...p, tripType: t })); setQuote(null); }} style={{ flex: 1, padding: '0.5rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '0.8rem', background: form.tripType === t ? 'var(--primary)' : 'var(--bg-dark)', color: form.tripType === t ? '#000' : 'var(--text-muted)', transition: 'all 0.2s' }}>
-                  {t === 'one-way' ? '→ One Way' : '↔ Round Trip'}
+                <button key={t} onClick={() => { setForm(p => ({ ...p, tripType: t })); setQuote(null); }} style={{ flex: 1, padding: '0.5rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', background: form.tripType === t ? 'var(--primary)' : 'var(--bg-dark)', color: form.tripType === t ? 'var(--ink)' : 'var(--text-muted)', transition: 'all 0.2s' }}>
+                  {t === 'one-way' ? 'One way' : 'Round trip'}
                 </button>
               ))}
             </div>
@@ -301,7 +296,7 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
             {/* Car Type */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
               {CAR_TYPES.map(c => (
-                <button key={c.id} onClick={() => { setForm(p => ({ ...p, carType: c.id })); setQuote(null); }} style={{ padding: '0.6rem', borderRadius: '0.5rem', border: form.carType === c.id ? '2px solid var(--primary)' : '2px solid var(--border)', background: form.carType === c.id ? 'rgba(245,158,11,0.1)' : 'var(--bg-dark)', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', color: 'var(--text-light)', fontFamily: 'Poppins, sans-serif' }}>
+                <button key={c.id} onClick={() => { setForm(p => ({ ...p, carType: c.id })); setQuote(null); }} style={{ padding: '0.6rem', borderRadius: '0.5rem', border: form.carType === c.id ? '2px solid var(--primary)' : '2px solid var(--border)', background: form.carType === c.id ? 'var(--brand-soft)' : 'var(--bg-dark)', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', color: 'var(--text-light)' }}>
                   <div style={{ height: '32px', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img src={c.image} alt={c.label} style={{ height: '100%', objectFit: 'contain' }} />
                   </div>
@@ -313,7 +308,7 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
 
             {/* Fare result — calculated by the server from a real route */}
             {quote && (
-              <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '0.5rem', padding: '0.875rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ background: 'var(--brand-soft)', border: '1px solid var(--line)', borderRadius: '0.5rem', padding: '0.875rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Estimated Fare</div>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>
@@ -326,10 +321,10 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
 
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button className="btn btn-secondary" onClick={handleCalculateFare} disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
-                {loading ? <span className="spinner-light" /> : '💰 Calculate Fare'}
+                {loading ? <span className="spinner-light" /> : 'Calculate Fare'}
               </button>
               <button className="btn btn-primary" disabled={!form.pickup || !form.drop || !form.date || !form.carType} onClick={() => { if (!quote) { setError('Calculate the fare before continuing.'); return; } setError(null); setStep(1); }} style={{ flex: 2, justifyContent: 'center', fontWeight: 600 }}>
-                Next →
+                Next
               </button>
             </div>
           </div>
@@ -365,9 +360,9 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
             </label>
 
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button className="btn btn-outline" onClick={() => setStep(0)} style={{ flex: 1, justifyContent: 'center' }}>← Back</button>
+              <button className="btn btn-outline" onClick={() => setStep(0)} style={{ flex: 1, justifyContent: 'center' }}>Back</button>
               <button className="btn btn-primary" onClick={handleCreateBooking} disabled={loading || !agreed} style={{ flex: 2, justifyContent: 'center', fontWeight: 600 }}>
-                {loading ? <span className="spinner" /> : '✓ Confirm & Pay'}
+                {loading ? <span className="spinner" /> : 'Confirm & Pay'}
               </button>
             </div>
           </div>
@@ -376,7 +371,7 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
         {/* Step 2: Payment */}
         {step === 2 && (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
+            
             <h3 style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Complete Payment</h3>
             <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
               Booking ID: <strong style={{ color: 'var(--primary)' }}>{booking?.bookingId}</strong>
@@ -397,7 +392,7 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
                 disabled={loading || !paymentOrder}
                 style={{ justifyContent: 'center', fontWeight: 600, padding: '0.875rem' }}
               >
-                {loading ? <span className="spinner" /> : '💳 Pay with Razorpay'}
+                {loading ? <span className="spinner" /> : 'Pay with Razorpay'}
               </button>
               <button className="btn btn-outline" onClick={onClose} style={{ justifyContent: 'center' }}>
                 Pay later — my booking is saved
@@ -412,11 +407,11 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
         {/* Step 3: Confirmation */}
         {step === 3 && (
           <div style={{ textAlign: 'center' }}>
-            <div className="animate-bounce" style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</div>
+            <div className="success-mark"><Check size={34} /></div>
             <h3 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: '0.5rem', color: 'var(--accent)' }}>Booking Confirmed!</h3>
             <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Your ride has been successfully booked.</p>
 
-            <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '0.75rem', padding: '1.25rem', marginBottom: '1.5rem' }}>
+            <div style={{ background: 'var(--brand-soft)', border: '1px solid var(--line)', borderRadius: '0.75rem', padding: '1.25rem', marginBottom: '1.5rem' }}>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Your Booking ID</div>
               <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.05em' }}>{booking?.bookingId}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Save this ID to track your ride</div>
@@ -424,11 +419,11 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
 
             <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
               {[
-                ['📍 Pickup', form.pickup],
-                ['🏁 Drop', form.drop],
-                ['🚗 Car', CAR_TYPES.find(c => c.id === form.carType)?.label],
-                ['📅 Date', form.date],
-                ['💰 Fare', `₹${(booking?.fare ?? quote?.fare)?.toLocaleString()}`],
+                ['Pickup', form.pickup],
+                ['Drop', form.drop],
+                ['Car', CAR_TYPES.find(c => c.id === form.carType)?.label],
+                ['Date', form.date],
+                ['Fare', `₹${(booking?.fare ?? quote?.fare)?.toLocaleString()}`],
               ].map(([k, v]) => (
                 <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: '1px solid var(--border)', fontSize: '0.875rem' }}>
                   <span style={{ color: 'var(--text-muted)' }}>{k}</span>
@@ -439,7 +434,7 @@ export default function BookingModal({ initialCar, initialData, onClose, onAuthR
 
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button className="btn btn-primary" onClick={() => { onClose(); setTimeout(() => document.getElementById('track')?.scrollIntoView({ behavior: 'smooth' }), 300); }} style={{ flex: 1, justifyContent: 'center', fontWeight: 600 }}>
-                📍 Track Ride
+                Track ride
               </button>
               <button className="btn btn-outline" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Close</button>
             </div>

@@ -4,6 +4,7 @@ import dzireImg from '../img/maruti_desire.png';
 import innovaImg from '../img/toyota_innova.png';
 import tempoImg from '../img/tt.png';
 import { quoteTrip, unwrap, apiError } from '../api/index.js';
+import { Arrow, Swap } from './Icons.jsx';
 import { searchKnownPlaces, resolvePlace, KNOWN_PLACES } from '../utils/geocode.js';
 
 const CAR_TYPES = [
@@ -141,126 +142,47 @@ export default function RideBooking({ onBookNow }) {
   };
 
   return (
-    <div className="section" style={{ background: 'linear-gradient(180deg, var(--bg-dark) 0%, #080f20 100%)', position: 'relative', overflow: 'hidden' }}>
-      <div className="cyber-grid-bg" style={{ opacity: 0.3 }} />
-      <style>{`
-        .suggestions-list {
-          position: absolute; top: 100%; left: 0; right: 0;
-          background: rgba(8,18,42,0.95);
-          border: 1px solid rgba(0,212,255,0.2);
-          border-radius: 0.4rem; z-index: 10; margin-top: 0.25rem;
-          list-style: none; padding: 0.25rem;
-          box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 15px rgba(0,212,255,0.05);
-          backdrop-filter: blur(16px);
-        }
-        .suggestion-item {
-          padding: 0.6rem 1rem; cursor: pointer; color: var(--text-light);
-          transition: background 0.2s; border-radius: 0.25rem;
-          font-size: 0.85rem; font-family: 'Rajdhani', sans-serif; font-weight: 500;
-        }
-        .suggestion-item:hover { background: rgba(0,212,255,0.08); color: var(--primary); }
-        .billing-warning {
-          background: rgba(255,170,0,0.06);
-          border: 1px solid rgba(255,170,0,0.25);
-          border-radius: 0.5rem;
-          padding: 0.75rem 1.25rem; margin-bottom: 2rem;
-          color: var(--warn); font-size: 0.83rem;
-          display: flex; align-items: center; gap: 0.75rem;
-          font-family: 'Rajdhani', sans-serif;
-        }
-      `}</style>
-      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
-          <div className="badge" style={{ marginBottom: '1rem' }}>🚕 Instant Booking</div>
+    <div className="section">
+      <div className="container">
+        <div className="section-head">
+          <span className="eyebrow">Book online</span>
+          <h2 className="section-title">Get your fare in seconds</h2>
+          <p className="section-subtitle">Choose your pickup and drop, pick a vehicle and see the price before you book.</p>
         </div>
-        <h2 className="section-title">Book Your <span>Ride</span></h2>
 
-        {/* Error / guidance banner. Only shown when there is something real to say. */}
-        {error && (
-          <div className="billing-warning" role="alert">
-            <span>⚠️</span>
-            <span>{error}</span>
-          </div>
-        )}
-        <p className="section-subtitle">Fast, reliable, and comfortable taxi service from Udupi</p>
-
-        {/* Popular Routes */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center', marginBottom: '2.5rem' }}>
+        <div className="chips" style={{ justifyContent: 'center', marginBottom: '2rem' }}>
           {POPULAR_ROUTES.map(route => (
-            <button
-              key={route.label}
-              onClick={() => handleRoute(route)}
-              style={{
-                background: 'rgba(8,18,42,0.7)',
-                border: '1px solid rgba(0,212,255,0.15)',
-                color: 'var(--text-muted)', padding: '0.45rem 1rem', borderRadius: '0.35rem',
-                cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontSize: '0.82rem',
-                fontWeight: 600, letterSpacing: '0.04em',
-                transition: 'all 0.25s', backdropFilter: 'blur(8px)',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'rgba(0,212,255,0.4)';
-                e.currentTarget.style.color = 'var(--primary)';
-                e.currentTarget.style.background = 'rgba(0,212,255,0.06)';
-                e.currentTarget.style.boxShadow = '0 0 10px rgba(0,212,255,0.1)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)';
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.background = 'rgba(8,18,42,0.7)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              📍 {route.label}
+            <button key={route.label} className="chip" onClick={() => handleRoute(route)}>
+              {route.label}
             </button>
           ))}
         </div>
 
-        <div style={{
-          background: 'rgba(8,18,42,0.8)',
-          border: '1px solid rgba(0,212,255,0.15)',
-          borderRadius: '0.75rem', padding: '2rem',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(0,212,255,0.04)',
-          maxWidth: '900px', margin: '0 auto',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          position: 'relative', overflow: 'hidden',
-        }}>
-          {/* Top gradient line */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent)' }} />
+        <div className="panel">
+          {/* Only shown when there is something real to say */}
+          {error && <div className="alert-error" role="alert">{error}</div>}
 
-          {/* Trip Type Toggle */}
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+          <div className="segmented" role="tablist" aria-label="Trip type">
             {['one-way', 'round-trip'].map(type => (
               <button
                 key={type}
+                role="tab"
+                aria-selected={tripType === type}
+                className={tripType === type ? 'active' : ''}
                 onClick={() => { setTripType(type); setQuote(null); }}
-                style={{
-                  padding: '0.5rem 1.25rem', borderRadius: '0.35rem',
-                  cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif', fontWeight: 700,
-                  fontSize: '0.85rem', transition: 'all 0.2s', letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  background: tripType === type
-                    ? 'linear-gradient(135deg, var(--primary), var(--secondary))'
-                    : 'rgba(0,212,255,0.04)',
-                  color: tripType === type ? '#fff' : 'var(--text-muted)',
-                  border: tripType === type ? 'none' : '1px solid rgba(0,212,255,0.1)',
-                  boxShadow: tripType === type ? '0 0 15px rgba(0,212,255,0.25)' : 'none',
-                }}
               >
-                {type === 'one-way' ? '→ One Way' : '↔ Round Trip'}
+                {type === 'one-way' ? <><Arrow size={16} /> One way</> : <><Swap size={16} /> Round trip</>}
               </button>
             ))}
           </div>
 
-          {/* Form Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div className="form-grid">
             <div className="input-group" style={{ position: 'relative' }}>
-              <label htmlFor="pickup-input">📍 Pickup Location</label>
+              <label htmlFor="pickup-input">Pickup location</label>
               <input
                 id="pickup-input"
                 className="input"
-                placeholder="From (e.g., Udupi Bus Stand)"
+                placeholder="e.g. Udupi Bus Stand"
                 value={pickup}
                 autoComplete="off"
                 aria-expanded={showPickupSugg}
@@ -269,32 +191,24 @@ export default function RideBooking({ onBookNow }) {
                 onFocus={() => setShowPickupSugg(true)}
                 onBlur={() => setTimeout(() => setShowPickupSugg(false), 200)}
               />
-              {pickupCoords && (
-                <span id="pickup-hint" style={{ fontSize: '0.68rem', color: 'var(--accent)', fontFamily: 'Rajdhani, sans-serif' }}>
-                  ✓ Location set
-                </span>
-              )}
+              {pickupCoords && <span id="pickup-hint" className="field-ok">Location set</span>}
               {showPickupSugg && searchKnownPlaces(pickup).length > 0 && (
                 <ul className="suggestions-list" role="listbox">
                   {searchKnownPlaces(pickup).map(place => (
-                    <li
-                      key={place.label}
-                      role="option"
-                      className="suggestion-item"
-                      onMouseDown={() => selectPlace(place, 'pickup')}
-                    >
+                    <li key={place.label} role="option" className="suggestion-item" onMouseDown={() => selectPlace(place, 'pickup')}>
                       {place.label}
                     </li>
                   ))}
                 </ul>
               )}
             </div>
+
             <div className="input-group" style={{ position: 'relative' }}>
-              <label htmlFor="drop-input">🏁 Drop Location</label>
+              <label htmlFor="drop-input">Drop location</label>
               <input
                 id="drop-input"
                 className="input"
-                placeholder="To (e.g., Mangalore Airport)"
+                placeholder="e.g. Mangalore Airport"
                 value={drop}
                 autoComplete="off"
                 aria-expanded={showDropSugg}
@@ -302,36 +216,28 @@ export default function RideBooking({ onBookNow }) {
                 onFocus={() => setShowDropSugg(true)}
                 onBlur={() => setTimeout(() => setShowDropSugg(false), 200)}
               />
-              {dropCoords && (
-                <span style={{ fontSize: '0.68rem', color: 'var(--accent)', fontFamily: 'Rajdhani, sans-serif' }}>
-                  ✓ Location set
-                </span>
-              )}
+              {dropCoords && <span className="field-ok">Location set</span>}
               {showDropSugg && searchKnownPlaces(drop).length > 0 && (
                 <ul className="suggestions-list" role="listbox">
                   {searchKnownPlaces(drop).map(place => (
-                    <li
-                      key={place.label}
-                      role="option"
-                      className="suggestion-item"
-                      onMouseDown={() => selectPlace(place, 'drop')}
-                    >
+                    <li key={place.label} role="option" className="suggestion-item" onMouseDown={() => selectPlace(place, 'drop')}>
                       {place.label}
                     </li>
                   ))}
                 </ul>
               )}
             </div>
+
             <div className="input-group">
-              <label>📅 Date</label>
-              <input className="input" type="date" min={today} value={date} onChange={e => setDate(e.target.value)} />
+              <label htmlFor="date-input">Date</label>
+              <input id="date-input" className="input" type="date" min={today} value={date} onChange={e => setDate(e.target.value)} />
             </div>
             <div className="input-group">
-              <label>⏰ Time</label>
-              <input className="input" type="time" value={time} onChange={e => setTime(e.target.value)} />
+              <label htmlFor="time-input">Time</label>
+              <input id="time-input" className="input" type="time" value={time} onChange={e => setTime(e.target.value)} />
             </div>
             <div className="input-group">
-              <label htmlFor="passengers-input">👥 Passengers</label>
+              <label htmlFor="passengers-input">Passengers</label>
               <input
                 id="passengers-input"
                 className="input" type="number" min="1" max="12"
@@ -341,55 +247,33 @@ export default function RideBooking({ onBookNow }) {
             </div>
           </div>
 
-          {/* Car Type Selector */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.875rem', fontFamily: 'Rajdhani, sans-serif', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>🚗 Select Car Type</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
-              {CAR_TYPES.map(car => (
-                <button
-                  key={car.id}
-                  onClick={() => { setCarType(car.id); setQuote(null); }}
-                  style={{
-                    padding: '0.875rem', borderRadius: '0.5rem', cursor: 'pointer',
-                    fontFamily: 'Rajdhani, sans-serif', textAlign: 'center', transition: 'all 0.25s',
-                    background: carType === car.id ? 'rgba(0,212,255,0.08)' : 'rgba(0,212,255,0.02)',
-                    border: carType === car.id ? '2px solid var(--primary)' : '1px solid rgba(0,212,255,0.12)',
-                    color: 'var(--text-light)',
-                    boxShadow: carType === car.id ? '0 0 15px rgba(0,212,255,0.15)' : 'none',
-                  }}
-                >
-                  <div style={{ marginBottom: '0.4rem', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <img src={car.image} alt={car.label} style={{ height: '100%', objectFit: 'contain' }} />
-                  </div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.15rem', letterSpacing: '0.04em' }}>{car.label}</div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--primary)', fontWeight: 600 }}>{car.rate} · Min {car.min}</div>
-                </button>
-              ))}
-            </div>
+          <span className="field-label" style={{ marginTop: '0.5rem' }}>Vehicle</span>
+          <div className="car-options">
+            {CAR_TYPES.map(car => (
+              <button
+                key={car.id}
+                className={`car-option${carType === car.id ? ' selected' : ''}`}
+                aria-pressed={carType === car.id}
+                onClick={() => { setCarType(car.id); setQuote(null); }}
+              >
+                <img src={car.image} alt="" />
+                <b>{car.label}</b>
+                <span>{car.rate} · min {car.min}</span>
+              </button>
+            ))}
           </div>
 
-          {/* Fare Estimate — every figure here comes from the server */}
+          {/* Every figure here comes from the server */}
           {quote && (
-            <div style={{
-              background: 'rgba(0,212,255,0.05)',
-              border: '1px solid rgba(0,212,255,0.2)',
-              borderRadius: '0.5rem', padding: '1rem 1.25rem', marginBottom: '1.5rem',
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem',
-            }}>
+            <div className="fare-box">
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.2rem', fontFamily: 'Rajdhani, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  Estimated Fare
-                </div>
-                <div style={{
-                  fontSize: '2.2rem', fontWeight: 800, color: 'var(--primary)',
-                  fontFamily: 'Orbitron, sans-serif',
-                  textShadow: '0 0 20px rgba(0,212,255,0.4)',
-                }}>₹{quote.fare.toLocaleString()}</div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif' }}>
+                <div className="label">Estimated fare</div>
+                <div className="amount">₹{quote.fare.toLocaleString()}</div>
+                <div className="note">
                   {quote.distanceKm} km · approx {Math.round(quote.durationMinutes)} min
                   {quote.breakdown?.roundTripMultiplier > 1 && ' · round trip'}
                 </div>
-                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'Rajdhani, sans-serif', marginTop: '0.3rem' }}>
+                <div className="note" style={{ marginTop: '0.25rem' }}>
                   Base ₹{quote.breakdown?.baseFare} (incl. {quote.breakdown?.includedKm} km)
                   {quote.breakdown?.chargeableKm > 0 && ` + ${quote.breakdown.chargeableKm} km @ ₹${quote.breakdown.perKmRate}/km`}
                   {quote.breakdown?.nightSurcharge > 0 && ` + ₹${quote.breakdown.nightSurcharge} night`}
@@ -397,19 +281,16 @@ export default function RideBooking({ onBookNow }) {
                   {quote.breakdown?.tax > 0 && ` + ₹${quote.breakdown.tax} tax`}
                 </div>
               </div>
-              <div className="badge">
-                {quote.distanceEstimated ? '≈ Distance estimated' : '✓ Route confirmed'}
-              </div>
+              <span className="badge">{quote.distanceEstimated ? 'Distance estimated' : 'Route confirmed'}</span>
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-secondary" onClick={handleEstimate} disabled={loading} style={{ flex: '1', minWidth: '140px', justifyContent: 'center' }}>
-              {loading ? <span className="spinner-light" /> : '💰 Get Estimate'}
+          <div className="actions">
+            <button className="btn btn-secondary btn-lg" onClick={handleEstimate} disabled={loading} style={{ flex: 1, minWidth: '150px' }}>
+              {loading ? <span className="spinner-light" /> : 'Get estimate'}
             </button>
-            <button className="btn btn-primary" onClick={handleBookNow} style={{ flex: '2', minWidth: '180px', justifyContent: 'center', fontWeight: 700 }}>
-              🚕 Book Now
+            <button className="btn btn-primary btn-lg" onClick={handleBookNow} style={{ flex: 2, minWidth: '180px' }}>
+              Book now
             </button>
           </div>
         </div>

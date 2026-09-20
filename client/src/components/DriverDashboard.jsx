@@ -8,15 +8,16 @@ import {
 } from '../api/index.js';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
+import { Logo } from './Icons.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /** The next action available at each stage of a ride. */
 const NEXT_ACTION = {
-  driver_assigned:  { action: 'en_route', label: '🛣️ Start driving to pickup' },
-  driver_en_route:  { action: 'arrived',  label: '📍 I have arrived' },
-  driver_arrived:   { action: 'start',    label: '🚕 Start trip' },
-  in_progress:      { action: 'complete', label: '🏁 Complete trip' },
+  driver_assigned:  { action: 'en_route', label: 'Start driving to pickup' },
+  driver_en_route:  { action: 'arrived',  label: 'I have arrived' },
+  driver_arrived:   { action: 'start',    label: 'Start trip' },
+  in_progress:      { action: 'complete', label: 'Complete trip' },
 };
 
 export default function DriverDashboard() {
@@ -96,7 +97,7 @@ export default function DriverDashboard() {
 
     socket.on('rideOffer', (offer) => {
       setRequests(prev => (prev.some(r => r.bookingId === offer.bookingId) ? prev : [offer, ...prev]));
-      toast('New ride request', { icon: '🚕' });
+      toast('New ride request');
     });
 
     socket.on('chatMessage', (msg) => {
@@ -224,83 +225,20 @@ export default function DriverDashboard() {
     );
   };
 
-  const cardStyle = {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(0,212,255,0.15)',
-    borderRadius: '1rem',
-    padding: '1.5rem',
-    marginBottom: '1.5rem',
-  };
-
-  const sectionTitleStyle = {
-    fontSize: '0.7rem',
-    fontWeight: 700,
-    color: 'var(--primary)',
-    letterSpacing: '0.12em',
-    textTransform: 'uppercase',
-    marginBottom: '1rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-  };
+  const carLabel = driver?.carType ? driver.carType.charAt(0).toUpperCase() + driver.carType.slice(1) : 'N/A';
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg, #08122a)',
-      color: 'var(--text-light, #e0f4ff)',
-      fontFamily: 'Rajdhani, sans-serif',
-    }}>
-      {/* Top Navbar */}
-      <nav style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '1rem 2rem',
-        borderBottom: '1px solid rgba(0,212,255,0.12)',
-        background: 'rgba(8,18,42,0.98)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>🚖</span>
-          <span style={{ fontWeight: 700, fontSize: '1.1rem', letterSpacing: '0.05em' }}>
-            Driver Dashboard
-          </span>
+    <div className="dash">
+      <header className="dash-nav">
+        <div className="brand"><Logo size={30} /><span>Driver <em>dashboard</em></span></div>
+        <div className="nav-actions">
+          <span className="nav-user">{driver?.name}</span>
+          <button className="btn btn-outline btn-sm" onClick={logoutDriver}>Log out</button>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '0.875rem', color: 'var(--text-muted, #8899aa)' }}>
-            👤 {driver?.name}
-          </span>
-          <button
-            onClick={logoutDriver}
-            style={{
-              background: 'rgba(239,68,68,0.12)',
-              border: '1px solid rgba(239,68,68,0.3)',
-              color: '#f87171',
-              borderRadius: '0.5rem',
-              padding: '0.45rem 1rem',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              fontFamily: 'inherit',
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+      </header>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-
-        {error && (
-          <div role="alert" style={{
-            background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)',
-            color: '#fca5a5', borderRadius: '0.75rem', padding: '0.85rem 1.15rem',
-            marginBottom: '1.5rem', fontSize: '0.85rem',
-          }}>{error}</div>
-        )}
+      <div className="dash-wrap">
+        {error && <div className="alert-error" role="alert">{error}</div>}
 
         {/*
           Approval is separate from being signed in. A driver who has verified
@@ -308,12 +246,9 @@ export default function DriverDashboard() {
           this, but cannot receive rides.
         */}
         {!canAcceptRides && (
-          <div style={{
-            background: 'rgba(251,191,36,0.07)', border: '1px solid rgba(251,191,36,0.3)',
-            color: '#fbbf24', borderRadius: '1rem', padding: '1.25rem 1.5rem', marginBottom: '1.5rem',
-          }}>
-            <div style={{ fontWeight: 700, marginBottom: '0.35rem' }}>⏳ Account under review</div>
-            <div style={{ fontSize: '0.85rem', lineHeight: 1.6, color: '#fde68a' }}>
+          <div className="notice-warn">
+            <strong>Account under review</strong>
+            <div>
               Status: <strong>{driver?.approvalStatus?.replace(/_/g, ' ') || 'pending'}</strong>.
               {driver?.approvalStatus === 'pending_documents'
                 ? ' Upload your licence, RC and insurance so an admin can verify your account.'
@@ -324,36 +259,23 @@ export default function DriverDashboard() {
         )}
 
         {canAcceptRides && (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            gap: '1rem', flexWrap: 'wrap',
-            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(0,212,255,0.15)',
-            borderRadius: '1rem', padding: '1.25rem 1.5rem', marginBottom: '1.5rem',
-          }}>
+          <div className="card dash-card presence">
             <div>
-              <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '0.2rem' }}>
-                {isOnline ? '🟢 Online' : '⚫ Offline'}
+              <div className="presence-state">
+                <span className={`dot${isOnline ? ' on' : ''}`} /> {isOnline ? 'Online' : 'Offline'}
               </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted, #8899aa)' }}>
+              <div className="presence-note">
                 {gpsError
-                  ? `⚠ ${gpsError}`
+                  ? gpsError
                   : sharing && position
-                    ? `📡 Sharing location · ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
+                    ? `Sharing location · ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
                     : isOnline ? 'Acquiring GPS…' : 'Go online to receive ride requests'}
               </div>
             </div>
             <button
+              className={`btn btn-sm ${isOnline ? 'btn-outline' : 'btn-primary'}`}
               onClick={handleToggleAvailability}
               disabled={actionLoading === 'availability' || availability === 'on_trip'}
-              style={{
-                background: isOnline ? 'rgba(239,68,68,0.12)' : 'linear-gradient(135deg, #00d4ff, #7b2fff)',
-                border: isOnline ? '1px solid rgba(239,68,68,0.3)' : 'none',
-                color: isOnline ? '#f87171' : '#fff',
-                borderRadius: '0.5rem', padding: '0.6rem 1.4rem',
-                cursor: availability === 'on_trip' ? 'not-allowed' : 'pointer',
-                fontSize: '0.9rem', fontWeight: 700, fontFamily: 'inherit',
-                opacity: availability === 'on_trip' ? 0.5 : 1,
-              }}
             >
               {availability === 'on_trip' ? 'On a trip' : isOnline ? 'Go offline' : 'Go online'}
             </button>
@@ -362,133 +284,53 @@ export default function DriverDashboard() {
 
         {/* Active ride lifecycle controls */}
         {activeRide && NEXT_ACTION[activeRide.status] && (
-          <div style={{
-            background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.28)',
-            borderRadius: '1rem', padding: '1.25rem 1.5rem', marginBottom: '1.5rem',
-          }}>
-            <div style={{ fontSize: '0.7rem', color: '#4ade80', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-              Current ride · {activeRide.bookingId}
-            </div>
-            <div style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>
-              {activeRide.pickup} → {activeRide.drop}
-            </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted, #8899aa)', marginBottom: '1rem' }}>
-              {activeRide.distanceKm} km · ₹{activeRide.fare?.toLocaleString()}
+          <div className="card dash-card ride-now">
+            <h2 className="h-sm" style={{ color: 'var(--success)' }}>Current ride · {activeRide.bookingId}</h2>
+            <div className="req-route">{activeRide.pickup} → {activeRide.drop}</div>
+            <div className="req-meta" style={{ marginBottom: '1rem' }}>
+              <span>{activeRide.distanceKm} km · ₹{activeRide.fare?.toLocaleString()}</span>
               {activeRide.customer?.phone && (
-                <> · <a href={`tel:${activeRide.customer.phone}`} style={{ color: '#00d4ff' }}>
-                  📞 {activeRide.customer.phone}
-                </a></>
+                <a href={`tel:${activeRide.customer.phone}`} style={{ fontWeight: 600, color: 'var(--ink)' }}>
+                  Call {activeRide.customer.phone}
+                </a>
               )}
             </div>
-            <button
-              onClick={handleAdvance}
-              disabled={actionLoading === 'advance'}
-              style={{
-                background: 'linear-gradient(135deg, #22c55e, #00d4ff)', border: 'none', color: '#fff',
-                borderRadius: '0.5rem', padding: '0.7rem 1.5rem', cursor: 'pointer',
-                fontSize: '0.9rem', fontWeight: 700, fontFamily: 'inherit', width: '100%',
-              }}
-            >
+            <button className="btn btn-dark btn-block" onClick={handleAdvance} disabled={actionLoading === 'advance'}>
               {actionLoading === 'advance' ? 'Updating…' : NEXT_ACTION[activeRide.status].label}
             </button>
           </div>
         )}
 
-        {/* Stats section */}
-        <div style={{ ...cardStyle, display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-          <div style={{
-            flex: 1,
-            minWidth: '160px',
-            background: 'rgba(0,212,255,0.06)',
-            border: '1px solid rgba(0,212,255,0.2)',
-            borderRadius: '0.75rem',
-            padding: '1.25rem',
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#00d4ff', lineHeight: 1 }}>
-              {loadingStats ? '—' : stats.totalRides}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#4ade80', marginTop: '0.2rem', fontWeight: 700 }}>
-              {loadingStats ? '' : `₹${(stats.totalEarnings || 0).toLocaleString()} earned`}
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #8899aa)', marginTop: '0.4rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Total Rides
-            </div>
+        <div className="stat-grid">
+          <div className="stat">
+            <div className="stat-value">{loadingStats ? '—' : stats.totalRides}</div>
+            <div className="stat-label">Completed rides</div>
+            {!loadingStats && <div className="stat-sub">₹{(stats.totalEarnings || 0).toLocaleString()} earned</div>}
           </div>
-          <div style={{
-            flex: 1,
-            minWidth: '160px',
-            background: activeRide ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${activeRide ? 'rgba(34,197,94,0.25)' : 'rgba(255,255,255,0.08)'}`,
-            borderRadius: '0.75rem',
-            padding: '1.25rem',
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: '2rem', lineHeight: 1 }}>
-              {activeRide ? '🟢' : '⚫'}
+          <div className="stat">
+            <div className="stat-value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem', color: activeRide ? 'var(--success)' : 'var(--text-muted)' }}>
+              {activeRide ? 'On a ride' : 'No active ride'}
             </div>
-            <div style={{ fontSize: '0.8rem', color: activeRide ? '#4ade80' : 'var(--text-muted, #8899aa)', marginTop: '0.4rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              {activeRide ? 'On Active Ride' : 'No Active Ride'}
-            </div>
+            <div className="stat-label">Status</div>
           </div>
-          <div style={{
-            flex: 1,
-            minWidth: '160px',
-            background: 'rgba(123,47,255,0.06)',
-            border: '1px solid rgba(123,47,255,0.2)',
-            borderRadius: '0.75rem',
-            padding: '1.25rem',
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: '1.5rem', lineHeight: 1 }}>🚗</div>
-            <div style={{ fontSize: '0.75rem', color: '#a78bfa', marginTop: '0.4rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              {driver?.carType ? driver.carType.charAt(0).toUpperCase() + driver.carType.slice(1) : 'N/A'}
-            </div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted, #8899aa)', marginTop: '0.2rem' }}>
-              {driver?.carNumber || '—'}
-            </div>
+          <div className="stat">
+            <div className="stat-value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>{carLabel}</div>
+            <div className="stat-label">{driver?.carNumber || 'Vehicle'}</div>
           </div>
         </div>
 
-        {/* Travel Requests */}
-        <div style={cardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <p style={{ ...sectionTitleStyle, marginBottom: 0 }}>📋 Customer Travel Requests</p>
-            <button
-              onClick={fetchRequests}
-              style={{
-                background: 'rgba(0,212,255,0.08)',
-                border: '1px solid rgba(0,212,255,0.2)',
-                color: '#00d4ff',
-                borderRadius: '0.4rem',
-                padding: '0.3rem 0.75rem',
-                cursor: 'pointer',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                fontFamily: 'inherit',
-              }}
-            >
-              ↻ Refresh
-            </button>
+        <section className="card dash-card">
+          <div className="dash-card-head">
+            <h2 className="h-sm">Travel requests</h2>
+            <button className="btn btn-outline btn-sm" onClick={fetchRequests}>Refresh</button>
           </div>
 
           {loadingRequests ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted, #8899aa)' }}>
-              <span className="spinner" style={{ display: 'inline-block' }} /> Loading requests...
-            </div>
+            <div className="dash-empty"><span className="spinner-light" /> Loading requests…</div>
           ) : requests.length === 0 ? (
-            <div style={{
-              textAlign: 'center',
-              padding: '2rem',
-              color: 'var(--text-muted, #8899aa)',
-              border: '1px dashed rgba(255,255,255,0.08)',
-              borderRadius: '0.75rem',
-            }}>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔍</div>
-              <p style={{ margin: 0, fontSize: '0.9rem' }}>No pending travel requests</p>
-            </div>
+            <div className="dash-empty">No pending travel requests right now.</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
               {requests.map((req) => (
                 <RequestCard
                   key={req.bookingId}
@@ -500,123 +342,51 @@ export default function DriverDashboard() {
               ))}
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Chat section */}
-        <div style={cardStyle}>
-          <p style={sectionTitleStyle}>💬 Customer Chat</p>
+        <section className="card dash-card">
+          <h2 className="h-sm">Customer chat</h2>
           {!activeRide ? (
-            <div style={{
-              textAlign: 'center',
-              padding: '2rem',
-              color: 'var(--text-muted, #8899aa)',
-              border: '1px dashed rgba(255,255,255,0.08)',
-              borderRadius: '0.75rem',
-            }}>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</div>
-              <p style={{ margin: 0, fontSize: '0.9rem' }}>Chat is available when you have an active ride</p>
-            </div>
+            <div className="dash-empty">Chat is available when you have an active ride.</div>
           ) : (
             <div>
-              <div style={{
-                fontSize: '0.8rem',
-                color: 'var(--text-muted, #8899aa)',
-                marginBottom: '0.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}>
-                <span style={{
-                  width: '8px', height: '8px', borderRadius: '50%',
-                  background: socketConnected ? '#4ade80' : '#f87171',
-                  display: 'inline-block',
-                }} />
-                {socketConnected ? 'Connected' : 'Connecting...'} • Chatting with{' '}
-                <strong style={{ color: 'var(--text-light, #e0f4ff)' }}>{activeRide.customer?.name || 'Customer'}</strong>
-                {' '}• Booking {activeRide.bookingId}
+              <div className="chat-meta">
+                <span className={`dot${socketConnected ? ' on' : ''}`} />
+                {socketConnected ? 'Connected' : 'Connecting…'} · Chatting with{' '}
+                <strong>{activeRide.customer?.name || 'Customer'}</strong> · Booking {activeRide.bookingId}
               </div>
 
-              {/* Messages */}
-              <div style={{
-                height: '260px',
-                overflowY: 'auto',
-                border: '1px solid rgba(0,212,255,0.12)',
-                borderRadius: '0.75rem',
-                padding: '0.75rem',
-                marginBottom: '0.75rem',
-                background: 'rgba(0,0,0,0.2)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-              }}>
-                {messages.length === 0 && (
-                  <div style={{ textAlign: 'center', color: 'var(--text-muted, #8899aa)', fontSize: '0.85rem', marginTop: '5rem' }}>
-                    No messages yet. Start the conversation!
-                  </div>
-                )}
+              <div className="chat-log" style={{ height: '260px' }}>
+                {messages.length === 0 && <p className="chat-empty">No messages yet. Start the conversation.</p>}
                 {messages.map((msg, i) => {
                   const isDriver = msg.senderName === (driver?.name || 'Driver');
                   return (
-                    <div key={msg.msgId || i} style={{
-                      display: 'flex',
-                      justifyContent: isDriver ? 'flex-end' : 'flex-start',
-                    }}>
-                      <div style={{
-                        maxWidth: '70%',
-                        background: isDriver
-                          ? 'linear-gradient(135deg, rgba(0,212,255,0.25), rgba(123,47,255,0.25))'
-                          : 'rgba(255,255,255,0.06)',
-                        border: isDriver ? '1px solid rgba(0,212,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: isDriver ? '1rem 1rem 0 1rem' : '1rem 1rem 1rem 0',
-                        padding: '0.5rem 0.85rem',
-                      }}>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted, #8899aa)', marginBottom: '0.2rem', fontWeight: 600 }}>
-                          {msg.senderName}
-                        </div>
-                        <div style={{ fontSize: '0.9rem' }}>{msg.body}</div>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted, #8899aa)', marginTop: '0.2rem', textAlign: 'right' }}>
-                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
+                    <div key={msg.id || i} className={`bubble${isDriver ? ' own' : ''}`}>
+                      <small>{msg.senderName} · {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
+                      {msg.body}
                     </div>
                   );
                 })}
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input */}
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <input
                   className="input"
-                  placeholder="Type a message..."
+                  aria-label="Message"
+                  placeholder="Type a message"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                   disabled={!socketConnected}
-                  style={{ flex: 1 }}
                 />
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!socketConnected || !chatInput.trim()}
-                  style={{
-                    background: 'linear-gradient(135deg, #00d4ff, #7b2fff)',
-                    border: 'none',
-                    color: '#fff',
-                    borderRadius: '0.5rem',
-                    padding: '0 1.25rem',
-                    cursor: 'pointer',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    fontFamily: 'inherit',
-                    opacity: (!socketConnected || !chatInput.trim()) ? 0.5 : 1,
-                  }}
-                >
+                <button className="btn btn-dark" onClick={handleSendMessage} disabled={!socketConnected || !chatInput.trim()}>
                   Send
                 </button>
               </div>
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );
@@ -627,110 +397,35 @@ function RequestCard({ request, actionLoading, onAccept, onDecline }) {
 
   const formatDate = (d) => {
     try {
-      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      return new Date(d).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
     } catch (_) {
       return d;
     }
   };
 
+  // The accept/decline endpoints and this list are keyed by bookingId; the
+  // server's request DTO has no `_id`, `date`, `distance` or `user` fields.
   return (
-    <div style={{
-      background: 'rgba(0,212,255,0.03)',
-      border: '1px solid rgba(0,212,255,0.12)',
-      borderRadius: '0.75rem',
-      padding: '1rem 1.25rem',
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'space-between',
-      gap: '1rem',
-      flexWrap: 'wrap',
-    }}>
+    <div className="req-card">
       <div style={{ flex: 1, minWidth: '200px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#00d4ff', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            {request.bookingId}
-          </span>
-          <span style={{
-            fontSize: '0.65rem',
-            background: 'rgba(123,47,255,0.2)',
-            color: '#a78bfa',
-            borderRadius: '0.25rem',
-            padding: '0.1rem 0.4rem',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-          }}>
-            {request.carType}
-          </span>
-          <span style={{
-            fontSize: '0.65rem',
-            background: 'rgba(0,212,255,0.1)',
-            color: '#67e8f9',
-            borderRadius: '0.25rem',
-            padding: '0.1rem 0.4rem',
-            fontWeight: 600,
-          }}>
-            {request.tripType}
-          </span>
+        <div className="req-tags">
+          <b>{request.bookingId}</b>
+          <span className="tag" style={{ textTransform: 'capitalize' }}>{request.carType}</span>
+          <span className="tag">{request.tripType}</span>
         </div>
-
-        <div style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.2rem' }}>
-          📍 {request.pickup}
+        <div className="req-route">{request.pickup} → {request.drop}</div>
+        <div className="req-meta">
+          {request.scheduledFor && <span>{formatDate(request.scheduledFor)}</span>}
+          {request.distanceKm != null && <span>{request.distanceKm} km</span>}
+          {request.distanceToPickupKm != null && <span>{request.distanceToPickupKm} km to pickup</span>}
+          {request.fare != null && <span className="req-fare">₹{request.fare.toLocaleString()}</span>}
         </div>
-        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted, #8899aa)', marginBottom: '0.5rem' }}>
-          🏁 {request.drop}
-        </div>
-
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-muted, #8899aa)' }}>
-          <span>📅 {formatDate(request.date)}{request.time ? ` @ ${request.time}` : ''}</span>
-          {request.distance && <span>📏 {request.distance} km</span>}
-          {request.fare && (
-            <span style={{ color: '#4ade80', fontWeight: 700 }}>₹{request.fare}</span>
-          )}
-        </div>
-
-        {request.user && (
-          <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted, #8899aa)' }}>
-            👤 {request.user.name}{request.user.phone ? ` • ${request.user.phone}` : ''}
-          </div>
-        )}
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', alignSelf: 'center' }}>
-        <button
-          onClick={() => onDecline(request._id)}
-          disabled={isLoading}
-          style={{
-            background: 'rgba(239,68,68,0.1)',
-            border: '1px solid rgba(239,68,68,0.3)',
-            color: '#f87171',
-            borderRadius: '0.5rem',
-            padding: '0.5rem 1rem',
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-            fontWeight: 700,
-            fontFamily: 'Rajdhani, sans-serif',
-            opacity: isLoading ? 0.5 : 1,
-          }}
-        >
-          ✗ Reject
-        </button>
-        <button
-          onClick={() => onAccept(request._id)}
-          disabled={isLoading}
-          style={{
-            background: 'linear-gradient(135deg, rgba(34,197,94,0.25), rgba(21,128,61,0.25))',
-            border: '1px solid rgba(34,197,94,0.4)',
-            color: '#4ade80',
-            borderRadius: '0.5rem',
-            padding: '0.5rem 1rem',
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-            fontWeight: 700,
-            fontFamily: 'Rajdhani, sans-serif',
-            opacity: isLoading ? 0.5 : 1,
-          }}
-        >
-          {isLoading ? '...' : '✓ Accept'}
+        <button className="btn btn-outline btn-sm" onClick={() => onDecline(request.bookingId)} disabled={isLoading}>Decline</button>
+        <button className="btn btn-primary btn-sm" onClick={() => onAccept(request.bookingId)} disabled={isLoading}>
+          {isLoading ? '…' : 'Accept'}
         </button>
       </div>
     </div>

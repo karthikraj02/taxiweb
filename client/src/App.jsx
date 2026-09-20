@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import Navbar from './components/Navbar.jsx';
+import Navbar, { PHONE_HREF } from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import RideBooking from './components/RideBooking.jsx';
 import Fleet from './components/Fleet.jsx';
@@ -16,6 +16,16 @@ import DriverDashboard from './components/DriverDashboard.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 import { useDriver } from './context/DriverContext.jsx';
 
+const TOAST_OPTIONS = {
+  style: {
+    background: '#0f1b2d',
+    color: '#fff',
+    fontSize: '0.92rem',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    borderRadius: '10px',
+  },
+};
+
 export default function App() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -29,7 +39,7 @@ export default function App() {
   if (!driverLoading && driver) {
     return (
       <>
-        <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(8,18,42,0.95)', color: '#e0f4ff', border: '1px solid rgba(0,212,255,0.2)', backdropFilter: 'blur(12px)', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 } }} />
+        <Toaster position="top-right" toastOptions={TOAST_OPTIONS} />
         <DriverDashboard />
       </>
     );
@@ -43,13 +53,18 @@ export default function App() {
 
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(8,18,42,0.95)', color: '#e0f4ff', border: '1px solid rgba(0,212,255,0.2)', backdropFilter: 'blur(12px)', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 } }} />
+      <Toaster position="top-right" toastOptions={TOAST_OPTIONS} />
       <Navbar onAuthClick={() => setShowAuthModal(true)} onDriverAuthClick={() => setShowDriverAuthModal(true)} />
       <main>
         <section id="home"><Hero onBookNow={() => openBooking()} /></section>
         <section id="ride"><RideBooking onBookNow={openBooking} /></section>
         <section id="fleet"><Fleet onBookNow={(carType) => openBooking(carType)} /></section>
-        <section id="tours"><Tours onEnquire={() => setShowAuthModal(true)} /></section>
+        <section id="tours">
+          <Tours
+            onEnquire={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            onDestination={(drop) => openBooking(null, { pickup: 'Udupi', drop })}
+          />
+        </section>
         <section id="track"><Track /></section>
         <section id="contact"><Contact /></section>
         {user?.role === 'admin' && (
@@ -58,25 +73,10 @@ export default function App() {
       </main>
       <Footer />
 
-      <button
-        onClick={() => openBooking()}
-        style={{
-          position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 999,
-          background: 'linear-gradient(135deg, #00d4ff, #7b2fff)',
-          color: '#fff', border: 'none',
-          borderRadius: '0.5rem', padding: '0.9rem 1.5rem', fontWeight: 700,
-          fontSize: '0.9rem', cursor: 'pointer',
-          boxShadow: '0 0 20px rgba(0,212,255,0.35), 0 8px 30px rgba(0,0,0,0.4)',
-          display: 'flex', alignItems: 'center', gap: '0.5rem',
-          transition: 'transform 0.2s, box-shadow 0.2s',
-          fontFamily: 'Rajdhani, sans-serif',
-          letterSpacing: '0.06em', textTransform: 'uppercase',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 0 35px rgba(0,212,255,0.5), 0 12px 40px rgba(0,0,0,0.4)'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(0,212,255,0.35), 0 8px 30px rgba(0,0,0,0.4)'; }}
-      >
-        🚕 Book a Ride
-      </button>
+      <div className="mobile-bar">
+        <a className="btn btn-secondary" href={PHONE_HREF}>Call us</a>
+        <button className="btn btn-primary" onClick={() => openBooking()}>Book a ride</button>
+      </div>
 
       {showBookingModal && (
         <BookingModal

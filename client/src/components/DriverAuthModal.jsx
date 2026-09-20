@@ -5,6 +5,7 @@ import {
 } from '../api/index.js';
 import { useDriver } from '../context/DriverContext.jsx';
 import toast from 'react-hot-toast';
+import { Logo, Check } from './Icons.jsx';
 
 const CAR_TYPES = [
   { value: 'etios', label: 'Toyota Etios' },
@@ -156,12 +157,12 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
 
   // ─── Shared styles ────────────────────────────────────────────────────────
   const photoBoxStyle = {
-    border: '2px dashed rgba(0,212,255,0.3)',
+    border: '2px dashed var(--line-strong)',
     borderRadius: '0.5rem',
     padding: '0.75rem',
     textAlign: 'center',
     cursor: 'pointer',
-    background: 'rgba(0,212,255,0.04)',
+    background: 'var(--bg-soft)',
     transition: 'border-color 0.2s',
     position: 'relative',
     overflow: 'hidden',
@@ -171,19 +172,11 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         {/* Close */}
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute', top: '1rem', right: '1rem',
-            background: 'rgba(255,255,255,0.08)', border: 'none', color: 'var(--text-light)',
-            width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer',
-            fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🚖</div>
+          <div className="logo-wrap"><Logo size={44} /></div>
           <h2 style={{ fontWeight: 700, fontSize: '1.4rem' }}>Driver Portal</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
             Udupi Taxi — Driver Access
@@ -208,12 +201,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
 
         {/* Error */}
         {error && (
-          <div style={{
-            background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-            color: '#f87171', padding: '0.75rem 1rem', borderRadius: '0.5rem',
-            fontSize: '0.875rem', marginBottom: '1rem',
-          }}>
-            ⚠️ {error}
+          <div className="alert-error" role="alert">{error}
           </div>
         )}
 
@@ -240,7 +228,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
                 disabled={loading}
                 style={{ width: '100%', justifyContent: 'center', fontWeight: 600 }}
               >
-                {loading ? <span className="spinner" /> : '📧 Send OTP'}
+                {loading ? <span className="spinner" /> : 'Send OTP'}
               </button>
             ) : (
               <>
@@ -263,7 +251,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
                     onClick={() => { setOtpSent(false); setOtpCode(''); }}
                     style={{ flex: 1, justifyContent: 'center' }}
                   >
-                    ← Change Email
+                    Change Email
                   </button>
                   <button
                     className="btn btn-primary"
@@ -271,7 +259,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
                     disabled={loading}
                     style={{ flex: 2, justifyContent: 'center', fontWeight: 600 }}
                   >
-                    {loading ? <span className="spinner" /> : '✓ Verify OTP'}
+                    {loading ? <span className="spinner" /> : 'Verify OTP'}
                   </button>
                 </div>
               </>
@@ -294,7 +282,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
         {activeTab === 'register' && (
           registered ? (
             <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✅</div>
+              <div className="success-mark"><Check size={30} /></div>
               <h3 style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Registration received</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: 1.6 }}>
                 Your account has been created. There are two more steps before you can accept rides:
@@ -321,7 +309,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
                       disabled={loading}
                       style={{ justifyContent: 'center', width: '100%' }}
                     >
-                      {loading ? 'Uploading…' : '📄 Upload my documents'}
+                      {loading ? 'Uploading…' : 'Upload my documents'}
                     </button>
                   ) : (
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
@@ -438,7 +426,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
                       />
                     ) : (
                       <div style={{ padding: '1rem 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                        <div style={{ fontSize: '1.5rem' }}>👤</div>
+                        <div style={{ fontSize: '1.4rem', lineHeight: 1 }}>+</div>
                         <div>Upload Photo</div>
                       </div>
                     )}
@@ -465,7 +453,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
                       />
                     ) : (
                       <div style={{ padding: '1rem 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                        <div style={{ fontSize: '1.5rem' }}>🚗</div>
+                        <div style={{ fontSize: '1.4rem', lineHeight: 1 }}>+</div>
                         <div>Upload Photo</div>
                       </div>
                     )}
@@ -485,7 +473,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
                 disabled={loading}
                 style={{ width: '100%', justifyContent: 'center', fontWeight: 600, marginTop: '0.5rem' }}
               >
-                {loading ? <span className="spinner" /> : '🚖 Register as Driver'}
+                {loading ? <span className="spinner" /> : 'Register as Driver'}
               </button>
 
               <p style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { requestOTP, apiError } from '../api/index.js';
 import toast from 'react-hot-toast';
+import { Logo } from './Icons.jsx';
 
 export default function AuthModal({ onClose }) {
   const [activeTab, setActiveTab] = useState('login');
@@ -97,29 +98,21 @@ export default function AuthModal({ onClose }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         {/* Close Button */}
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute', top: '1rem', right: '1rem',
-            background: 'rgba(255,255,255,0.08)', border: 'none', color: 'var(--text-light)',
-            width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer',
-            fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🚕</div>
-          <h2 style={{ fontWeight: 700, fontSize: '1.4rem' }}>Welcome to Udupi Taxi</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>Sign in to book your ride</p>
+        <div className="modal-head">
+          <div className="logo-wrap"><Logo size={44} /></div>
+          <h2>Welcome to Udupi Taxi</h2>
+          <p>Sign in to book your ride</p>
         </div>
 
         {/* Tabs */}
         <div className="tabs">
           {[
-            { id: 'login', label: 'Login' },
+            { id: 'login', label: 'Log in' },
             { id: 'register', label: 'Register' },
-            { id: 'otp', label: 'OTP Login' },
+            { id: 'otp', label: 'OTP' },
           ].map(t => (
             <button key={t.id} className={`tab ${activeTab === t.id ? 'active' : ''}`} onClick={() => handleTabChange(t.id)}>
               {t.label}
@@ -129,12 +122,7 @@ export default function AuthModal({ onClose }) {
 
         {/* Error */}
         {error && (
-          <div style={{
-            background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-            color: '#f87171', padding: '0.75rem 1rem', borderRadius: '0.5rem',
-            fontSize: '0.875rem', marginBottom: '1rem',
-          }}>
-            ⚠️ {error}
+          <div className="alert-error" role="alert">{error}
           </div>
         )}
 
@@ -158,7 +146,7 @@ export default function AuthModal({ onClose }) {
               />
             </div>
             <button className="btn btn-primary" type="submit" disabled={loading} style={{ width: '100%', justifyContent: 'center', fontWeight: 600, marginTop: '0.5rem' }}>
-              {loading ? <span className="spinner" /> : 'Login'}
+              {loading ? <span className="spinner" /> : 'Log in'}
             </button>
           </form>
         )}
@@ -215,7 +203,7 @@ export default function AuthModal({ onClose }) {
             </div>
             {!otpSent ? (
               <button className="btn btn-primary" onClick={handleSendOTP} disabled={loading} style={{ width: '100%', justifyContent: 'center', fontWeight: 600 }}>
-                {loading ? <span className="spinner" /> : '📱 Send OTP'}
+                {loading ? <span className="spinner" /> : 'Send OTP'}
               </button>
             ) : (
               <>
@@ -229,10 +217,10 @@ export default function AuthModal({ onClose }) {
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <button className="btn btn-secondary" onClick={() => setOtpSent(false)} style={{ flex: 1, justifyContent: 'center' }}>
-                    ← Change Number
+                    Change number
                   </button>
                   <button className="btn btn-primary" onClick={handleVerifyOTP} disabled={loading} style={{ flex: 2, justifyContent: 'center', fontWeight: 600 }}>
-                    {loading ? <span className="spinner" /> : '✓ Verify OTP'}
+                    {loading ? <span className="spinner" /> : 'Verify OTP'}
                   </button>
                 </div>
               </>
