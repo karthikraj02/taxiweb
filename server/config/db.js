@@ -15,6 +15,23 @@ if (!env.isProduction) {
   }
 }
 
+const DEFAULT_DB_NAME = 'taxiweb';
+
+/**
+ * Which database to use.
+ *
+ * A MongoDB URI with no database name (`...mongodb.net/?retryWrites=true`)
+ * silently connects to a database called `test`, which is empty, so logins and
+ * lookups find nothing and writes may be rejected. Prefer an explicit
+ * MONGODB_DB, then the name in the URI, then a safe default.
+ * Returns undefined when the URI already names a database.
+ */
+function resolveDbName(uri, explicit = process.env.MONGODB_DB) {
+  if (explicit) return explicit;
+  const namesDatabase = /^mongodb(?:\+srv)?:\/\/[^/]+\/[^/?]+/.test(uri || '');
+  return namesDatabase ? undefined : DEFAULT_DB_NAME;
+}
+
 /**
  * Connect to MongoDB, retrying with backoff.
  *
@@ -33,9 +50,11 @@ async function connectDB(uri = env.mongoUri, { retries = 5, delayMs = 3000 } = {
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
+      const dbName = resolveDbName(uri);
       await mongoose.connect(uri, {
         serverSelectionTimeoutMS: 10000,
         maxPoolSize: 20,
+        ...(dbName ? { dbName } : {}),
       });
       logger.info('MongoDB connected');
       return mongoose.connection;
@@ -51,3 +70,4 @@ async function connectDB(uri = env.mongoUri, { retries = 5, delayMs = 3000 } = {
 }
 
 module.exports = connectDB;
+module.exports.resolveDbName = resolveDbName;

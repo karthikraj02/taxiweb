@@ -21,6 +21,7 @@ const mongoose = require('mongoose');
 const env = require('../config/env');
 const logger = require('../utils/logger');
 const createApp = require('../app');
+const { resolveDbName } = require('../config/db');
 
 let app;
 let connecting = null;
@@ -29,8 +30,9 @@ function connect() {
   if (mongoose.connection.readyState === 1) return Promise.resolve();
   if (!connecting) {
     mongoose.set('strictQuery', true);
+    const dbName = resolveDbName(env.mongoUri);
     connecting = mongoose
-      .connect(env.mongoUri, { serverSelectionTimeoutMS: 8000, maxPoolSize: 5 })
+      .connect(env.mongoUri, { serverSelectionTimeoutMS: 8000, maxPoolSize: 5, ...(dbName ? { dbName } : {}) })
       .catch((err) => {
         connecting = null;           // let the next request retry
         throw err;
