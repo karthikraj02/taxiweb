@@ -73,7 +73,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Udupi Taxi. All rights reserved.</span>
-          <a href="https://beautiful-alpaca-6b1495.netlify.app/" target="_blank" rel="noopener noreferrer">Website by the developer</a>
+          <a href="https://beautiful-alpaca-6b1495.netlify.app/" target="_blank" rel="noopener noreferrer">Built by Dev</a>
         </div>
       </div>
     </footer>
