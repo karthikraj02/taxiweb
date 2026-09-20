@@ -142,6 +142,7 @@ function createApp() {
   // ----------------------------------------------------------- routes
   app.get('/api/health', (req, res) => {
     const mongoose = require('mongoose');
+    const mailer = require('./services/mailer');
     res.json({
       success: true,
       data: {
@@ -149,6 +150,15 @@ function createApp() {
         db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
         demoMode: env.demoMode,
         timestamp: new Date().toISOString(),
+        // Deployment facts for diagnosing a misconfigured environment. No
+        // secrets: only which build is running, which database *name* it is
+        // using, and which email provider (if any) is configured.
+        deployment: {
+          version: (process.env.VERCEL_GIT_COMMIT_SHA || '').slice(0, 7) || null,
+          environment: env.nodeEnv,
+          database: mongoose.connection.name || null,
+          email: mailer.isEnabled() ? (env.resend.enabled ? 'resend' : 'smtp') : 'none',
+        },
       },
     });
   });
