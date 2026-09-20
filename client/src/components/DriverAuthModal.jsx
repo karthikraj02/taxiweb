@@ -55,7 +55,7 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
     try {
       await driverRequestOTP(loginEmail);
       setOtpSent(true);
-      toast.success('If that email is registered, a code has been sent.');
+      toast.success('Request received. Check your email for the code.');
     } catch (err) {
       setError(apiError(err, 'Could not send the code.'));
     } finally {
@@ -232,7 +232,18 @@ export default function DriverAuthModal({ onClose, onLoginSuccess }) {
               </button>
             ) : (
               <>
-                <div className="input-group" style={{ marginTop: '0.5rem' }}>
+                {/*
+                  The server answers identically whether or not an account exists
+                  (so the form cannot be used to discover who is registered).
+                  That means a driver who never registered would wait for an email
+                  that never comes, so say so here.
+                */}
+                <div className="notice-info" role="status">
+                  If a driver account exists for <strong>{loginEmail}</strong>, a 6-digit code is on its way
+                  (check spam too). Nothing is sent to an address that hasn&apos;t registered, so if you are
+                  new, <button type="button" className="link-btn" onClick={() => handleTabChange('register')}>register as a driver first</button>.
+                </div>
+                <div className="input-group" style={{ marginTop: '0.75rem' }}>
                   <label>Enter OTP (6 digits)</label>
                   <input
                     className="input"
