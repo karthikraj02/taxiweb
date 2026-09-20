@@ -20,18 +20,6 @@ const SERVICES = [
   { label: 'Wedding cars', id: 'contact' },
 ];
 
-const PHOTO_CREDITS = [
-  { name: 'Ashok Prabhakaran', license: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:Udupi_Sri_Krishna_Matha_Temple.jpg', what: 'Udupi Sri Krishna Matha' },
-  { name: 'Keshu', license: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:ST._MARY_ISLAND.jpg', what: "St. Mary's Island" },
-  { name: 'Dhruvaraj S', license: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Kudremukh_1.jpg', what: 'Kudremukh' },
-];
-
-const LICENSE_URLS = {
-  'CC BY-SA 2.0': 'https://creativecommons.org/licenses/by-sa/2.0/',
-  'CC BY-SA 3.0': 'https://creativecommons.org/licenses/by-sa/3.0/',
-  'CC BY 2.0': 'https://creativecommons.org/licenses/by/2.0/',
-};
-
 const SOCIAL = [
   { icon: Facebook, label: 'Facebook', href: '#' },
   { icon: Instagram, label: 'Instagram', href: '#' },
@@ -82,18 +70,6 @@ export default function Footer() {
             </div>
           </div>
         </div>
-
-        <p className="photo-credits">
-          Tour photos via Wikimedia Commons:{' '}
-          {PHOTO_CREDITS.map((c, i) => (
-            <React.Fragment key={c.what}>
-              {i > 0 && '; '}
-              <a href={c.url} target="_blank" rel="noopener noreferrer">{c.what}</a> by {c.name}
-              {' ('}<a href={LICENSE_URLS[c.license]} target="_blank" rel="noopener noreferrer">{c.license}</a>{')'}
-            </React.Fragment>
-          ))}
-          .
-        </p>
 
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Udupi Taxi. All rights reserved.</span>
