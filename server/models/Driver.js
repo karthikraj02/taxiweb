@@ -59,8 +59,15 @@ const driverSchema = new mongoose.Schema({
   availability: { type: String, enum: AVAILABILITY, default: 'offline' },
 
   // GeoJSON Point: [longitude, latitude] (PHASE 18)
+  //
+  // `type` deliberately has NO default. A default of 'Point' made every new
+  // driver start with `{ type: 'Point' }` and no coordinates, which is invalid
+  // GeoJSON: the 2dsphere index below rejects the insert ("Can't extract geo
+  // keys"), so registering any driver failed with a 500. Until the driver
+  // shares a location the field is simply absent, and 2dsphere skips absent
+  // fields. The location route sets `type` and `coordinates` together.
   currentLocation: {
-    type: { type: String, enum: ['Point'], default: 'Point' },
+    type: { type: String, enum: ['Point'] },
     coordinates: { type: [Number], default: undefined },
   },
   locationAccuracy: { type: Number },
