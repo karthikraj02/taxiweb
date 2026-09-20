@@ -25,9 +25,11 @@ if (!env.isProduction) {
  */
 async function connectDB(uri = env.mongoUri, { retries = 5, delayMs = 3000 } = {}) {
   mongoose.set('strictQuery', true);
-  // Reject unknown operators in filters, which closes off query-operator
-  // injection at the ODM layer as a second line of defence behind validation.
-  mongoose.set('sanitizeFilter', true);
+  // NOTE: do not enable `sanitizeFilter` globally. It rewrites every nested
+  // operator into a literal equality, which breaks this codebase's own queries
+  // ($in, $ne, $nin, $gte, $exists) with a CastError. Operator injection is
+  // closed off by the Zod validation in middleware/validate.js, which replaces
+  // req.body/query/params before any handler builds a filter.
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
