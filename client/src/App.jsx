@@ -57,7 +57,7 @@ export default function App() {
       <Navbar onAuthClick={() => setShowAuthModal(true)} onDriverAuthClick={() => setShowDriverAuthModal(true)} />
       <main>
         <section id="home"><Hero onBookNow={() => openBooking()} /></section>
-        <section id="ride"><RideBooking onBookNow={openBooking} /></section>
+        <section id="ride"><RideBooking onBookNow={openBooking} onAuthRequired={() => setShowAuthModal(true)} /></section>
         <section id="fleet"><Fleet onBookNow={(carType) => openBooking(carType)} /></section>
         <section id="tours">
           <Tours

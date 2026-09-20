@@ -4,6 +4,7 @@ import dzireImg from '../img/maruti_desire.png';
 import innovaImg from '../img/toyota_innova.png';
 import tempoImg from '../img/tt.png';
 import { quoteTrip, unwrap, apiError } from '../api/index.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import { Arrow, Swap } from './Icons.jsx';
 import { searchKnownPlaces, resolvePlace, KNOWN_PLACES } from '../utils/geocode.js';
 
@@ -22,7 +23,8 @@ const POPULAR_ROUTES = [
   { label: 'Udupi → Murudeshwara', pickup: 'Udupi Bus Stand', drop: 'Murudeshwara' },
 ];
 
-export default function RideBooking({ onBookNow }) {
+export default function RideBooking({ onBookNow, onAuthRequired }) {
+  const { isAuthenticated } = useAuth();
   const [pickup, setPickup] = useState('');
   const [drop, setDrop] = useState('');
   const [pickupCoords, setPickupCoords] = useState(null);
@@ -97,8 +99,17 @@ export default function RideBooking({ onBookNow }) {
     return { p, d };
   };
 
+  const LOGIN_TO_QUOTE = 'Please log in to see your fare. It only takes a moment.';
+
   const handleEstimate = async () => {
     setError(null);
+    // The server prices trips for signed-in customers only, so ask up front
+    // instead of surfacing a raw "Authentication required" error.
+    if (!isAuthenticated) {
+      setError(LOGIN_TO_QUOTE);
+      onAuthRequired?.();
+      return;
+    }
     const scheduledFor = scheduledForISO();
     if (!scheduledFor) { setError('Choose a pickup date first.'); return; }
 
@@ -117,7 +128,13 @@ export default function RideBooking({ onBookNow }) {
       }));
       setQuote(data);
     } catch (err) {
-      setError(apiError(err, 'We could not calculate a fare for that trip.'));
+      // A 401 here means the session expired while the page was open.
+      if (err?.response?.status === 401) {
+        setError(LOGIN_TO_QUOTE);
+        onAuthRequired?.();
+      } else {
+        setError(apiError(err, 'We could not calculate a fare for that trip.'));
+      }
       setQuote(null);
     } finally {
       setLoading(false);
