@@ -10,7 +10,15 @@ const QUICK_LINKS = [
   { label: 'Contact Us', id: 'contact' },
 ];
 
-const SERVICES = ['Airport transfers', 'Outstation cabs', 'Local taxi', 'Tour packages', 'Corporate travel', 'Wedding cars'];
+// Each service jumps to the section where it can be booked or enquired about.
+const SERVICES = [
+  { label: 'Airport transfers', id: 'ride' },
+  { label: 'Outstation cabs', id: 'ride' },
+  { label: 'Local taxi', id: 'ride' },
+  { label: 'Tour packages', id: 'tours' },
+  { label: 'Corporate travel', id: 'contact' },
+  { label: 'Wedding cars', id: 'contact' },
+];
 
 const PHOTO_CREDITS = [
   { name: 'Ashok Prabhakaran', license: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:Udupi_Sri_Krishna_Matha_Temple.jpg', what: 'Udupi Sri Krishna Matha' },
@@ -58,7 +66,11 @@ export default function Footer() {
 
           <div>
             <h4>Services</h4>
-            <ul>{SERVICES.map(s => <li key={s}>{s}</li>)}</ul>
+            <ul>
+              {SERVICES.map(s => (
+                <li key={s.label}><button className="footer-link" onClick={() => scrollTo(s.id)}>{s.label}</button></li>
+              ))}
+            </ul>
           </div>
 
           <div>
