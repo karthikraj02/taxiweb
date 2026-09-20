@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Udupi Taxi",
+    "slug": "udupi-taxi",
+    "scheme": "udupitaxi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "in.udupitaxi.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Drivers share their location while online so nearby riders can be matched."
+      }
+    },
+    "android": {
+      "package": "in.udupitaxi.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#f5b301",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Drivers share their location while online so nearby riders can be matched."
+        }
+      ],
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "backgroundColor": "#0f1b2d"
+        }
+      ]
+    ],
+    "extra": {
+      "apiUrl": "https://taxiweb-backend.vercel.app"
+    }
+  }
+}

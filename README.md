@@ -29,8 +29,18 @@ taxiweb/
 │   ├── validators/         Zod schemas
 │   └── tests/              unit + integration suites
 │
+├── mobile/                 React Native (Expo) app for Android + iOS, same API
+│                           (see mobile/README.md)
+│
 └── docs/DEPLOYMENT.md
 ```
+
+## Mobile app
+
+`mobile/` is a React Native (Expo) app for customers and drivers. It uses the
+same API as the website and needs no backend changes. Run it with
+`cd mobile && npm install && npx expo start` and open it in Expo Go.
+Details in [mobile/README.md](mobile/README.md).
 
 ## Getting started
 
