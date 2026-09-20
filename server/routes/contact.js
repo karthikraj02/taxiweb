@@ -2,6 +2,7 @@ const express = require('express');
 const env = require('../config/env');
 const ContactMessage = require('../models/ContactMessage');
 const logger = require('../utils/logger');
+const mailer = require('../services/mailer');
 const { validate } = require('../middleware/validate');
 const S = require('../validators/schemas');
 const { contactLimiter } = require('../middleware/rateLimiters');
@@ -29,17 +30,9 @@ router.post('/', contactLimiter, validate({ body: S.contactBody }), async (req, 
     // Email notification is best-effort and reported honestly: the message is
     // safely stored either way, so a mail outage does not lose the enquiry.
     let emailDelivered = false;
-    if (env.smtp.enabled && env.smtp.supportInbox) {
+    if (mailer.isEnabled() && env.smtp.supportInbox) {
       try {
-        const nodemailer = require('nodemailer');
-        const transporter = nodemailer.createTransport({
-          host: env.smtp.host,
-          port: env.smtp.port,
-          secure: env.smtp.secure,
-          auth: { user: env.smtp.user, pass: env.smtp.pass },
-        });
-        await transporter.sendMail({
-          from: env.smtp.from,
+        await mailer.send({
           to: env.smtp.supportInbox,
           replyTo: req.body.email || undefined,
           subject: `Website enquiry from ${req.body.name}`,

@@ -135,6 +135,16 @@ const env = {
       return Boolean(this.accountSid && this.authToken && this.phoneNumber);
     },
   },
+  // Email: Resend is preferred when RESEND_API_KEY is set; SMTP is the fallback.
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || '',
+    get enabled() {
+      return Boolean(this.apiKey);
+    },
+  },
+  // Sender address for Resend. onboarding@resend.dev works without a verified
+  // domain but can only deliver to the email that owns the Resend account.
+  emailFrom: process.env.EMAIL_FROM || 'onboarding@resend.dev',
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: num('SMTP_PORT', 587),

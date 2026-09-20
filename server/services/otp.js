@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const env = require('../config/env');
 const logger = require('../utils/logger');
+const mailer = require('./mailer');
 const { badRequest, tooManyReq } = require('../utils/errors');
 
 /**
@@ -112,22 +113,14 @@ async function sendSms(phone, otp) {
 
 /** Deliver by email. Never logs the code in production. */
 async function sendEmail(email, otp) {
-  if (!env.smtp.enabled) {
+  if (!mailer.isEnabled()) {
     if (env.isProduction) {
       throw badRequest('EMAIL_NOT_CONFIGURED', 'Email delivery is not configured.');
     }
-    logger.warn('SMTP not configured — OTP not delivered', { email });
+    logger.warn('Email not configured — OTP not delivered', { email });
     return { delivered: false, channel: 'none' };
   }
-  const nodemailer = require('nodemailer');
-  const transporter = nodemailer.createTransport({
-    host: env.smtp.host,
-    port: env.smtp.port,
-    secure: env.smtp.secure,
-    auth: { user: env.smtp.user, pass: env.smtp.pass },
-  });
-  await transporter.sendMail({
-    from: env.smtp.from,
+  await mailer.send({
     to: email,
     subject: 'Udupi Taxi — verification code',
     text: `Your verification code is ${otp}. It expires in ${env.otp.expiryMinutes} minutes. Do not share it with anyone.`,
