@@ -33,6 +33,14 @@ function connect() {
     const dbName = resolveDbName(env.mongoUri);
     connecting = mongoose
       .connect(env.mongoUri, { serverSelectionTimeoutMS: 8000, maxPoolSize: 5, ...(dbName ? { dbName } : {}) })
+      .then(async (conn) => {
+        try {
+          await require('../services/maintenance').dropLegacyIndexes();
+        } catch (cleanupErr) {
+          logger.error('Legacy index cleanup failed', { error: cleanupErr.message });
+        }
+        return conn;
+      })
       .catch((err) => {
         connecting = null;           // let the next request retry
         throw err;

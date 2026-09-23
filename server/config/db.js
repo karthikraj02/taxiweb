@@ -57,6 +57,11 @@ async function connectDB(uri = env.mongoUri, { retries = 5, delayMs = 3000 } = {
         ...(dbName ? { dbName } : {}),
       });
       logger.info('MongoDB connected');
+      try {
+        await require('../services/maintenance').dropLegacyIndexes();
+      } catch (cleanupErr) {
+        logger.error('Legacy index cleanup failed', { error: cleanupErr.message });
+      }
       return mongoose.connection;
     } catch (err) {
       logger.error('MongoDB connection failed', { attempt, retriesLeft: retries - attempt, error: err.message });
