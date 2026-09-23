@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 import { Banner, Button, Field, Screen, Segmented } from '../components/ui';
 import { colors, font, space } from '../theme';
 import { apiError } from '../api/client';
-import { requestOtp } from '../api/endpoints';
+import { forgotPassword, requestOtp, resetPassword } from '../api/endpoints';
 import { useAuth } from '../context/AuthContext';
 import type { RootStackParamList } from '../navigation/types';
 
-type Mode = 'login' | 'register' | 'otp';
+type Mode = 'login' | 'register' | 'otp' | 'forgot';
 
 /** Same rules the server enforces (server/validators/schemas.js), checked up front for faster feedback. */
 function passwordProblem(p: string): string | null {
@@ -34,7 +34,24 @@ export default function AuthScreen() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
 
+  // Forgot-password sub-flow.
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetCodeSent, setResetCodeSent] = useState(false);
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
   const switchMode = (m: Mode) => { setMode(m); setError(null); setInfo(null); setOtpSent(false); setOtp(''); };
+
+  const openForgotPassword = () => {
+    setResetEmail(email.trim());
+    setResetCodeSent(false);
+    setResetCode('');
+    setNewPassword('');
+    setError(null);
+    setInfo(null);
+    setMode('forgot');
+  };
+
   const done = () => nav.goBack();
 
   const run = async (fn: () => Promise<void>, fallback: string) => {
@@ -84,17 +101,47 @@ export default function AuthScreen() {
     run(async () => { await loginWithOtp(phone, otp); done(); }, 'That code was not accepted.');
   };
 
+  const sendResetCode = () => {
+    if (!resetEmail.trim()) { setError('Enter your email address.'); return; }
+    run(async () => {
+      await forgotPassword(resetEmail.trim());
+      setResetCodeSent(true);
+      setInfo('If that email is registered, a reset code has been sent. Check spam too.');
+    }, 'Could not send the reset code.');
+  };
+
+  const submitReset = () => {
+    if (resetCode.trim().length !== 6) { setError('Enter the 6-digit code.'); return; }
+    const problem = passwordProblem(newPassword);
+    if (problem) { setError(problem); return; }
+    run(async () => {
+      await resetPassword(resetEmail.trim(), resetCode.trim(), newPassword);
+      // The server revokes every existing session on reset, so the user signs
+      // in again with the new password rather than being silently logged in.
+      setEmail(resetEmail.trim());
+      setPassword('');
+      setMode('login');
+      setInfo('Password reset. Log in with your new password.');
+    }, 'That code was not accepted.');
+  };
+
   return (
     <Screen>
       <Text style={[font.h1, { marginBottom: 4 }]}>Welcome to Udupi Taxi</Text>
-      <Text style={[font.body, { marginBottom: space.lg }]}>Log in or create an account to book your ride.</Text>
+      <Text style={[font.body, { marginBottom: space.lg }]}>
+        {mode === 'forgot' ? 'Reset your password.' : 'Log in or create an account to book your ride.'}
+      </Text>
 
-      <Segmented<Mode>
-        value={mode}
-        onChange={switchMode}
-        options={[{ value: 'login', label: 'Log in' }, { value: 'register', label: 'Register' }, { value: 'otp', label: 'OTP' }]}
-      />
-      <View style={{ height: space.lg }} />
+      {mode !== 'forgot' ? (
+        <>
+          <Segmented<Mode>
+            value={mode}
+            onChange={switchMode}
+            options={[{ value: 'login', label: 'Log in' }, { value: 'register', label: 'Register' }, { value: 'otp', label: 'OTP' }]}
+          />
+          <View style={{ height: space.lg }} />
+        </>
+      ) : null}
 
       {error ? <Banner kind="error">{error}</Banner> : null}
       {info ? <Banner kind="info">{info}</Banner> : null}
@@ -103,6 +150,9 @@ export default function AuthScreen() {
         <>
           <Field label="Email" value={email} onChangeText={setEmail} placeholder="you@example.com" autoCapitalize="none" keyboardType="email-address" autoComplete="email" testID="login-email" />
           <Field label="Password" value={password} onChangeText={setPassword} placeholder="Your password" secureTextEntry autoComplete="password" testID="login-password" />
+          <Pressable onPress={openForgotPassword} hitSlop={8} style={{ alignSelf: 'flex-end', marginTop: -8, marginBottom: space.lg }}>
+            <Text style={{ color: colors.brandDark, fontWeight: '600', fontSize: 13 }}>Forgot password?</Text>
+          </Pressable>
           <Button testID="login-submit" title="Log in" onPress={submitLogin} loading={loading} />
         </>
       ) : null}
@@ -133,6 +183,35 @@ export default function AuthScreen() {
             </>
           )}
           <Text style={[font.small, { marginTop: space.lg, color: colors.muted }]}>Codes are sent by SMS and expire after 5 minutes.</Text>
+        </>
+      ) : null}
+
+      {mode === 'forgot' ? (
+        <>
+          <Field
+            label="Email"
+            value={resetEmail}
+            onChangeText={setResetEmail}
+            placeholder="you@example.com"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            editable={!resetCodeSent}
+            testID="forgot-email"
+          />
+          {!resetCodeSent ? (
+            <Button testID="forgot-send" title="Send reset code" onPress={sendResetCode} loading={loading} />
+          ) : (
+            <>
+              <Field label="6-digit code" value={resetCode} onChangeText={setResetCode} placeholder="123456" keyboardType="number-pad" maxLength={6} testID="forgot-code" />
+              <Field label="New password" value={newPassword} onChangeText={setNewPassword} placeholder="At least 10 characters" secureTextEntry testID="forgot-password" />
+              <Text style={[font.small, { marginTop: -8, marginBottom: space.lg }]}>Use upper and lower case letters and a number.</Text>
+              <View style={{ gap: 10 }}>
+                <Button testID="forgot-submit" title="Reset password" onPress={submitReset} loading={loading} />
+                <Button title="Change email" variant="ghost" onPress={() => { setResetCodeSent(false); setResetCode(''); setInfo(null); }} />
+              </View>
+            </>
+          )}
+          <Button title="Back to log in" variant="ghost" style={{ marginTop: space.md }} onPress={() => switchMode('login')} />
         </>
       ) : null}
     </Screen>
